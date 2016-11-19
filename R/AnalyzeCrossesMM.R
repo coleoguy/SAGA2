@@ -406,7 +406,6 @@ names(final.results) <- c("models", "estimates", "daicc", "varimp")
 class(final.results) <- "genarch"
 
 # lets reset peoples graphics paramters so they make sinces again
-par(old.par)
 return(final.results)
 }
   
