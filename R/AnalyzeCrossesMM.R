@@ -63,12 +63,24 @@ AnalyzeCrossesMM <- function(data, Cmatrix = "XY",
       Cmatrix <- read.csv(file = system.file("cmatrix.esd.csv", package = "SAGA2"), row.names=1)[, -1]
       sex.dep <- c("sex", "sex.Aa", "sex.Ad", "sex.Ca", "sex.Mea", "sex.Med")
       env.dep <- c("env", "env.Aa", "env.Ad", "env.Ca", "env.Mea", "env.Med")
+      
+      Cmatrix2 <- Cmatrix[data[,1] , ]
+      if(env.factor == T) Cmatrix2[, 1] <- data[,2]
+      # GxE
+      Cmatrix2[, 19] <- Cmatrix2[, 1] * Cmatrix2[, 4]
+      Cmatrix2[, 20] <- Cmatrix2[, 1] * Cmatrix2[, 5]
+      Cmatrix2[, 21] <- Cmatrix2[, 1] * Cmatrix2[, 6]
+      Cmatrix2[, 22] <- Cmatrix2[, 1] * Cmatrix2[, 7]
+      Cmatrix2[, 23] <- Cmatrix2[, 1] * Cmatrix2[, 8]
+
       if(even.sex == F){
         Cmatrix <- Cmatrix[, !colnames(Cmatrix) %in% sex.dep]
       }
+      
       if(env.factor == F){
         Cmatrix <- Cmatrix[, !colnames(Cmatrix) %in% env.dep]
       }
+      
     } else if(Cmatrix == "genomic"){
       print("Creating a genomic based cmatrix:")
       Cmatrix <- matrix(,nrow(data), 18)
