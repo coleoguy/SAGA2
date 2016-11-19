@@ -215,7 +215,7 @@ AnalyzeCrossesMM <- function(data, pheno, se, Cmatrix = "XY",
   counter <- 1
   for(i in 1:length(eqns)){
     # generate the matrix for the current model
-    test.mat <- as.matrix(red.Cmatrix[, c(which(colnames(red.Cmatrix)=="M"), eqns[[i]])])
+    test.mat <- as.matrix(red.Cmatrix[, eqns[[i]]])#c(which(colnames(red.Cmatrix)=="M"), 
     # fit the model weight is equal to the inverse of the square of the SE
     temp.mod <- glm(data$pheno ~ test.mat, weights = data$se ^ - 2)
     # this if statement will bypass a model with a singularity
