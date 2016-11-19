@@ -19,7 +19,7 @@ AnalyzeCrossesMM <- function(data, Cmatrix = "XY",
   ## load the possible contributions to cohort means
   if(is.vector(Cmatrix)){
     if(Cmatrix == "XY" | Cmatrix == "XO" | Cmatrix == "X0"){
-      Cmatrix <- read.csv(file = system.file("cmatrix.xy.csv", package = "SAGA"), row.names=1)[, -1]
+      Cmatrix <- read.csv(file = system.file("cmatrix.xy.csv", package = "SAGA2"), row.names=1)[, -1]
       sex.dep <- c("sex", "Xa", "Xd", "Ya", "XaAa", "XaAd", "XdAa", "XdAd", 
                    "YaAa", "YaAd", "YaXa", "CaXa", "CaXd", "CaYa", "sex.Aa", 
                    "sex.Ad", "sex.Xa", "sex.Xd", "sex.Ca", "sex.Mea", "sex.Med",
@@ -40,7 +40,7 @@ AnalyzeCrossesMM <- function(data, Cmatrix = "XY",
       
       
     } else if(Cmatrix == "ZW" | Cmatrix == "ZO" | Cmatrix == "Z0"){
-      Cmatrix <- read.csv(file = system.file("cmatrix.zw.csv", package = "SAGA"), row.names=1)[, -1]
+      Cmatrix <- read.csv(file = system.file("cmatrix.zw.csv", package = "SAGA2"), row.names=1)[, -1]
       sex.dep <- c("sex", "Za", "Zd", "Wa", "ZaAa", "ZaAd", "ZdAa", "ZdAd",
                    "WaAa", "WaAd", "ZaWa", "CaZa", "CaZd", "CaWa", "sex.Aa",
                    "sex.Ad", "sex.Za", "sex.Zd", "sex.Ca", "sex.Mea", "sex.Med",
@@ -60,7 +60,7 @@ AnalyzeCrossesMM <- function(data, Cmatrix = "XY",
       
       
     } else if(Cmatrix == "esd"){
-      Cmatrix <- read.csv(file = system.file("cmatrix.esd.csv", package = "SAGA"), row.names=1)[, -1]
+      Cmatrix <- read.csv(file = system.file("cmatrix.esd.csv", package = "SAGA2"), row.names=1)[, -1]
       sex.dep <- c("sex", "sex.Aa", "sex.Ad", "sex.Ca", "sex.Mea", "sex.Med")
       env.dep <- c("env", "env.Aa", "env.Ad", "env.Ca", "env.Mea", "env.Med")
       if(even.sex == F){
