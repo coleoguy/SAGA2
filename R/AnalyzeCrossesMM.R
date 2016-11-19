@@ -20,6 +20,7 @@ AnalyzeCrossesMM <- function(data, Cmatrix = "XY",
   if(is.vector(Cmatrix)){
     if(Cmatrix == "XY" | Cmatrix == "XO" | Cmatrix == "X0"){
       Cmatrix <- read.csv(file = system.file("cmatrix.xy.csv", package = "SAGA2"), row.names=1)[, -1]
+      Cmatrix <- Cmatrix[data[,1] , ]
       sex.dep <- c("sex", "Xa", "Xd", "Ya", "XaAa", "XaAd", "XdAa", "XdAd", 
                    "YaAa", "YaAd", "YaXa", "CaXa", "CaXd", "CaYa", "sex.Aa", 
                    "sex.Ad", "sex.Xa", "sex.Xd", "sex.Ca", "sex.Mea", "sex.Med",
@@ -41,6 +42,7 @@ AnalyzeCrossesMM <- function(data, Cmatrix = "XY",
       
     } else if(Cmatrix == "ZW" | Cmatrix == "ZO" | Cmatrix == "Z0"){
       Cmatrix <- read.csv(file = system.file("cmatrix.zw.csv", package = "SAGA2"), row.names=1)[, -1]
+      Cmatrix <- Cmatrix[data[,1] , ]
       sex.dep <- c("sex", "Za", "Zd", "Wa", "ZaAa", "ZaAd", "ZdAa", "ZdAd",
                    "WaAa", "WaAd", "ZaWa", "CaZa", "CaZd", "CaWa", "sex.Aa",
                    "sex.Ad", "sex.Za", "sex.Zd", "sex.Ca", "sex.Mea", "sex.Med",
@@ -61,18 +63,16 @@ AnalyzeCrossesMM <- function(data, Cmatrix = "XY",
       
     } else if(Cmatrix == "esd"){
       Cmatrix <- read.csv(file = system.file("cmatrix.esd.csv", package = "SAGA2"), row.names=1)[, -1]
+      Cmatrix <- Cmatrix[data[,1] , ]
       sex.dep <- c("sex", "sex.Aa", "sex.Ad", "sex.Ca", "sex.Mea", "sex.Med")
       env.dep <- c("env", "env.Aa", "env.Ad", "env.Ca", "env.Mea", "env.Med")
-      
-      Cmatrix2 <- Cmatrix[data[,1] , ]
       if(env.factor == T) Cmatrix2[, 1] <- data[,2]
       # GxE
-      Cmatrix2[, 19] <- Cmatrix2[, 1] * Cmatrix2[, 4]
-      Cmatrix2[, 20] <- Cmatrix2[, 1] * Cmatrix2[, 5]
-      Cmatrix2[, 21] <- Cmatrix2[, 1] * Cmatrix2[, 6]
-      Cmatrix2[, 22] <- Cmatrix2[, 1] * Cmatrix2[, 7]
-      Cmatrix2[, 23] <- Cmatrix2[, 1] * Cmatrix2[, 8]
-      Cmatrix <- Cmatrix2
+      Cmatrix[, 19] <- Cmatrix[, 1] * Cmatrix[, 4]
+      Cmatrix[, 20] <- Cmatrix[, 1] * Cmatrix[, 5]
+      Cmatrix[, 21] <- Cmatrix[, 1] * Cmatrix[, 6]
+      Cmatrix[, 22] <- Cmatrix[, 1] * Cmatrix[, 7]
+      Cmatrix[, 23] <- Cmatrix[, 1] * Cmatrix[, 8]
       if(even.sex == F){
         Cmatrix <- Cmatrix[, !colnames(Cmatrix) %in% sex.dep]
       }
@@ -123,15 +123,16 @@ AnalyzeCrossesMM <- function(data, Cmatrix = "XY",
     }
   }
   
-  # store the identity of the cohorts
-  identities <- data[,1]
-  # remove them from the dataframe we will be using for analysis
-  data <- data[,-1]
-  # keep only those lines that correspond to crosses that the user has data for
-  red.Cmatrix <- Cmatrix[identities,]  
-  
-  # lets remove variables that have no difference in lines
-  red.Cmatrix <- red.Cmatrix[, c(1, which(apply(red.Cmatrix, 2, var) != 0))]      
+# lets remove variables that have no difference in lines
+    cge.0 <- colnames(Cmatrix)[which(apply(Cmatrix, 2, var) == 0)]
+    cge.0 <- cge.0[cge.0!="M"]
+    red.Cmatrix <- Cmatrix
+    if(length(cge.0) > 0){
+      red.Cmatrix <- Cmatrix[, colnames(Cmatrix) != cge.0]      
+      print(paste(cge.0, "has no difference in expected line means and will not 
+                  be considered in your model"))
+    }
+
 
   
   # TODO we shouldn't be dropping higher order effects we should
