@@ -232,7 +232,7 @@ for(i in 1:length(eqns)){
   # generate the matrix for the current model
   test.mat <- as.matrix(red.Cmatrix[, c(1, eqns[[i]])])
   # fit the model weight is equal to the inverse of the square of the SE
-  temp.mod <- glm(data[, 1] ~ test.mat, weights = data[, 2] ^ - 2)
+  temp.mod <- glm(data$pheno ~ test.mat, weights = data$se ^ - 2)
   # this if statement will bypass a model with a singularity
   # 1 NA will be generated for the line mean any additional are sign of sing.
   if(sum(is.na(temp.mod$coef)) < 2){
