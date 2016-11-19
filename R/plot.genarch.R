@@ -1,6 +1,6 @@
 plot.genarch <- function(x, min.vi = .5, main=NULL, cex.axis=1, 
                          cex.names=1, cex.main=1, maxval=NULL, 
-                         minval=NULL, viridis=F, ...){
+                         minval=NULL, viridis=F, reset=F...){
   data <- x
   # lets store the graphic paratmeters so we leave people 
   # unscathed for their next plots
@@ -82,6 +82,6 @@ plot.genarch <- function(x, min.vi = .5, main=NULL, cex.axis=1,
            y = locs[4],
            labels = "Variable\nImportance", cex = 0.5, pos = 3)
       # lets reset peoples graphics paramters so they make sinces again
-      par(old.par)
+      if(reset==T) par(old.par)
       
 }
