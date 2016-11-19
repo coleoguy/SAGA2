@@ -1,0 +1,17 @@
+export(AnalyzeCrossesMM)
+export(DisplayCmatrix)
+export(EvaluateModel)
+export(VisModelSpace)
+export(cohortID)
+export(plotObserved)
+export(plot.genarch)
+export(AICtoMW)
+S3method(plot, genarch)
+
+importFrom(plotrix, color.legend)
+importFrom(grDevices, heat.colors)
+importFrom(graphics, barplot, mtext, par, plot, segments, text, abline, axis, lines)
+importFrom(stats, glm, pchisq, var, vcov)
+importFrom(utils, combn, read.csv)
+importFrom(viridis, viridis)
+
