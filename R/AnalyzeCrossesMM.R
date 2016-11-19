@@ -66,7 +66,7 @@ AnalyzeCrossesMM <- function(data, Cmatrix = "XY",
       Cmatrix <- Cmatrix[data[,1] , ]
       sex.dep <- c("sex", "sex.Aa", "sex.Ad", "sex.Ca", "sex.Mea", "sex.Med")
       env.dep <- c("env", "env.Aa", "env.Ad", "env.Ca", "env.Mea", "env.Med")
-      if(env.factor == T) Cmatrix2[, 1] <- data[,2]
+      if(env.factor == T) Cmatrix[, 1] <- data[,2]
       # GxE
       Cmatrix[, 19] <- Cmatrix[, 1] * Cmatrix[, 4]
       Cmatrix[, 20] <- Cmatrix[, 1] * Cmatrix[, 5]
@@ -128,32 +128,36 @@ AnalyzeCrossesMM <- function(data, Cmatrix = "XY",
     cge.0 <- cge.0[cge.0!="M"]
     red.Cmatrix <- Cmatrix
     if(length(cge.0) > 0){
-      red.Cmatrix <- Cmatrix[, colnames(Cmatrix) != cge.0]      
-      print(paste(cge.0, "has no difference in expected line means and will not 
-                  be considered in your model"))
+      red.Cmatrix <- Cmatrix[, !colnames(Cmatrix) %in% cge.0]      
+      print(paste(cge.0, "has no difference in expected line means and will not be considered in your model"))
     }
-
 
   
   # TODO we shouldn't be dropping higher order effects we should
   # let the user know that they are would receive equal support
   # and we should spread model uncertainty in accord with this
   #lets look for composite effects that are identical
-  drop.counter <- vector()
-  for(i in 2:(ncol(red.Cmatrix)-1)){
+  low.counter <- drop.counter <- vector()
+  Aa <- which(colnames(red.Cmatrix) == "Aa")
+  for(i in Aa:(ncol(red.Cmatrix)-1)){
     for(j in (i+1):ncol(red.Cmatrix)){
       if(sum(red.Cmatrix[,i] == red.Cmatrix[,j]) == nrow(red.Cmatrix)){
         drop.counter <- c(drop.counter, j)
+        low.counter <-  c(low.counter, i)
       }
     }
   }
   #drop those composite effects that are equivelant of lower order simpler effects
   if(length(drop.counter)>0){
-    leslie <- paste(colnames(red.Cmatrix)[drop.counter], sep=", ", collapse=", ")
+    leslie <- colnames(red.Cmatrix)[drop.counter]
+    abbi <- colnames(red.Cmatrix)[low.counter]
     cat(paste("The following composite effects cannot be estimated with the line \n",
               "means available because they estimate identical quantities to \n",
-              "lower order effects: \n", leslie, "\n\n", sep=""))
-    red.Cmatrix <- red.Cmatrix[,-drop.counter]
+              "lower order effects: \n",sep=""))
+    for(i in 1:length(drop.counter)){
+      cat(paste(leslie[i], "is being dropped because it equals", abbi, "\n", sep=""))
+      red.Cmatrix <- red.Cmatrix[,-drop.counter]
+    }
   }
   have.data <- paste(colnames(red.Cmatrix)[-1], collapse = ", ")
   cat(paste("The composite genetic effects that will be tested are: \n", 
@@ -385,4 +389,5 @@ AnalyzeCrossesMM <- function(data, Cmatrix = "XY",
   names(final.results) <- c("models", "estimates", "daicc", "varimp")
   class(final.results) <- "genarch"
   return(final.results)
-}
+  }
+  
