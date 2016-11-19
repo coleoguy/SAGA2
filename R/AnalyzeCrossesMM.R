@@ -1,7 +1,10 @@
-AnalyzeCrossesMM <- function(data, Cmatrix = "XY", 
+AnalyzeCrossesMM <- function(data, pheno, se, Cmatrix = "XY", 
                              env.factor=FALSE, even.sex = F,
                              max.models = 300000, model.sum = .95, max.pars = NULL){
   # lets check and make sure that people picked or supplied a cmatrix
+  colnames(data)[pheno] <- "pheno"
+  colnames(data)[se] <- "se"
+  
   if(is.null(Cmatrix)) stop("Please supply or choose a Cmatrix")
   
   # if they are supplying the Cmatrix lets do a couple of basic checks
@@ -213,7 +216,7 @@ AnalyzeCrossesMM <- function(data, Cmatrix = "XY",
     # generate the matrix for the current model
     test.mat <- as.matrix(red.Cmatrix[, c(1, eqns[[i]])])
     # fit the model weight is equal to the inverse of the square of the SE
-    temp.mod <- glm(data[, 1] ~ test.mat, weights = data[, 2] ^ - 2)
+    temp.mod <- glm(data$pheno ~ test.mat, weights = data$se ^ - 2)
     # this if statement will bypass a model with a singularity
     # 1 NA will be generated for the line mean any additional are sign of sing.
     if(sum(is.na(temp.mod$coef)) < 2){
