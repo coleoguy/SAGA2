@@ -72,7 +72,7 @@ AnalyzeCrossesMM <- function(data, Cmatrix = "XY",
       Cmatrix2[, 21] <- Cmatrix2[, 1] * Cmatrix2[, 6]
       Cmatrix2[, 22] <- Cmatrix2[, 1] * Cmatrix2[, 7]
       Cmatrix2[, 23] <- Cmatrix2[, 1] * Cmatrix2[, 8]
-
+      Cmatrix <- Cmatrix2
       if(even.sex == F){
         Cmatrix <- Cmatrix[, !colnames(Cmatrix) %in% sex.dep]
       }
