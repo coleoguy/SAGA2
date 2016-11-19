@@ -158,12 +158,13 @@ AnalyzeCrossesMM <- function(data, pheno, se, Cmatrix = "XY",
               "means available because they estimate identical quantities to \n",
               "lower order effects: \n",sep=""))
     for(i in 1:length(drop.counter)){
-      cat(paste(leslie[i], "is being dropped because it equals", abbi, "\n", sep=""))
+      cat(paste(leslie[i], " is being dropped because it equals ", abbi[i], "\n", sep=""))
       red.Cmatrix <- red.Cmatrix[,-drop.counter]
     }
   }
-  have.data <- paste(colnames(red.Cmatrix)[-1], collapse = ", ")
-  cat(paste("The composite genetic effects that will be tested are: \n", 
+  cat(paste("\n","\n", sep=""))
+  have.data <- paste(colnames(red.Cmatrix), collapse = ", ")
+  cat(paste("The composite effects that will be tested are: \n", 
               have.data, collapse = ", "), "\n\n")
   # calcualte the potential size of model space
   # the final -2 is because we will always be including the mean so we have
@@ -176,7 +177,7 @@ AnalyzeCrossesMM <- function(data, pheno, se, Cmatrix = "XY",
     cat(paste("Since there are ", mod.space.size, " possible models this may take a bit:\n", sep=""))
   }
   # generate all possible models storing each matrix in a list
-  pos.cols <- 2:ncol(red.Cmatrix)             # col that could be used
+  pos.cols <- which(colnames(red.Cmatrix) != "M") # col that could be used
   eqns <- list()                              # store the eqns
   counter <- 1                                # index for eqns
   max.par <- nrow(red.Cmatrix) - 2            #
