@@ -301,7 +301,7 @@ AnalyzeCrossesMM <- function(data, pheno, se, Cmatrix = "XY",
   par.est <- matrix(0, length(best.eqns), ncol(red.Cmatrix) + 2)
   colnames(par.est) <- c('eqn', colnames(red.Cmatrix), 'mw')
   par.est[, 1] <- names(best.models)
-  par.est[, 2] <- 1
+  par.est[, which(colnames(red.Cmatrix)=="M")] <- 1
   # now we need a 1 or 0  if the parameter is in the eqn
   for(i in 1:nrow(par.est)){
     bar <- as.numeric(par.est[i, 1])
