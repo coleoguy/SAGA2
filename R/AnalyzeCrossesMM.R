@@ -4,7 +4,7 @@ AnalyzeCrossesMM <- function(data, pheno, se, Cmatrix = "XY",
   # lets check and make sure that people picked or supplied a cmatrix
   colnames(data)[pheno] <- "pheno"
   colnames(data)[se] <- "se"
-  
+  Cmatrix.flag <- Cmatrix
   if(is.null(Cmatrix)) stop("Please supply or choose a Cmatrix")
   
   # if they are supplying the Cmatrix lets do a couple of basic checks
@@ -37,7 +37,7 @@ AnalyzeCrossesMM <- function(data, pheno, se, Cmatrix = "XY",
       if(env.factor == F){
         Cmatrix <- Cmatrix[, !colnames(Cmatrix) %in% env.dep]
       }
-      if(Cmatrix == "XO" | Cmatrix == "X0"){
+      if(Cmatrix.flag == "XO" | Cmatrix.flag == "X0"){
         Cmatrix <- Cmatrix[, !colnames(Cmatrix) %in% y.dep]
       }
       
@@ -59,7 +59,7 @@ AnalyzeCrossesMM <- function(data, pheno, se, Cmatrix = "XY",
       if(env.factor == F){
         Cmatrix <- Cmatrix[, !colnames(Cmatrix) %in% env.dep]
       }
-      if(Cmatrix == "ZO" | Cmatrix == "Z0"){
+      if(Cmatrix.flag == "ZO" | Cmatrix.flag == "Z0"){
         Cmatrix <- Cmatrix[, !colnames(Cmatrix) %in% w.dep]
       }
       
