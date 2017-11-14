@@ -1,7 +1,7 @@
 PrepareCmatrix <- function(user.data, SCS, parental, drop.pars, env) {
   
   if(!all(unique(sort(user.data$enviro)) %in% c(-1,1))){
-    print("Scaling environmental variabel to be on a scale of -1, 1")
+    print("Scaling environmental variable to be on a scale of -1, 1")
     user.data$enviro <- ReScale2(user.data$enviro)
   }
   
@@ -213,6 +213,8 @@ PrepareCmatrix <- function(user.data, SCS, parental, drop.pars, env) {
     cmatrix <- cbind(cmatrix, temp.col)
     names(cmatrix)[ncol(cmatrix)] <- paste(names(cmatrix)[x], names(cmatrix)[y], sep="")
   }
+  # drop EnvEnv that makes no sense
+  cmatrix <- cmatrix[, names(cmatrix) != "EnvEnv"]
   ##### end of cmatrix expansion #####
   
   ##### return the gold to the user #####
