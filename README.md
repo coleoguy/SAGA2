@@ -1,4 +1,4 @@
-SAGA
+SAGA2
 ====
 
 Software for the Analysis of Genetic Architecture
@@ -7,33 +7,18 @@ to cite this package please use:
 
 Blackmon, H. and J. P. Demuth. 2015. SAGA: An R package for an information-theoretic approach to estimating the composite genetic effects contributing to variation among generation means: moving beyond the joint-scaling test for line cross analysis.  [![DOI:10.5281/zenodo.32513](https://zenodo.org/badge/18367/coleoguy/SAGA.svg)](https://zenodo.org/badge/latestdoi/18367/coleoguy/SAGA)
 
+The package SAGA was a collection functions to ease and hopefully improve the quality of line cross analysis of genetic architecture.  The overall goal was to allow for an easy and straightforward implementation of model averaged analysis composite genetic effects using line means.  SAGA2 takes the next step in the analysis of this type of data by building in environemntal variation and making the actual analysis easier for the end user.
 
+In the past users had to make or confirm the type of C-matrix that correctly described the composite genetic effects in their experiment.  With SAGA2 users simply supply the breeding design of their experiment and the software generates the appropriate C-matrix automatically.
 
-
-The package SAGA is a collection functions to ease and hopefully improve the quality of line cross analysis of genetic architecture.  The overall goal is to allow for an easy and straightforward implementation of model averaged analysis using AICc.
-
-If you want the very latest version of SAGA then you can install my developmental version from GitHub.
-
-If you don't have the package devtools installed yet you will need to do that first: 
+These insrtuction will install SAGA2: 
 
 `install.packages("devtools")`
 
 `library(devtools)`
 
-`install_github('coleoguy/SAGA')`
+`install_github('coleoguy/SAGA2')`
 
-`library(SAGA)`
+`library(SAGA2)`
 
-
-This package also includes a vignette to build the vignette during instillation use the following code:
-
-`install_github("coleoguy/SAGA", build_vignettes = TRUE)`
-
-`library(SAGA)`
-
-If you are using R studio the best way to get to the vignette is to click on the package in the packages tab in the lower
-right window.  Then there will ba a link to package descriptions and vignettes. If your just using a bare terminal you can use this command:
-
-`vignette("model-averaged-analysis", package='SAGA')`
-
-if you have questions or problems please let me know [coleoguy@gmail.com](mailto:coleoguy@gmail.com).
+If you have questions or problems please let me know [coleoguy@gmail.com](mailto:coleoguy@gmail.com).
