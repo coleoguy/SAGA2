@@ -1,4 +1,4 @@
-VisModelSpace <- function(data, cex.u = 3, cex.mtext=1, cex.leg=.8, reset=F){
+VisModelSpace <- function(data, cex.u = 3, cex.mtext=1, cex.leg=.8){
   .pardefault <- par(no.readonly = T)
   models <- data[[1]]
   data <- data[[3]]
@@ -38,5 +38,5 @@ VisModelSpace <- function(data, cex.u = 3, cex.mtext=1, cex.leg=.8, reset=F){
   par(xpd = TRUE)
   text(x=(((locs[2] + 1.5) + (locs[2] + (locs[2]*.05)))/2),
        y=(locs[4]+.2), labels="Akaike Weights", pos=3, cex=cex.leg)
-  if(reset==T) par(.pardefault)  
+  par(.pardefault)  
 }
