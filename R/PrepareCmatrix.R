@@ -1,6 +1,6 @@
 PrepareCmatrix <- function(user.data, SCS, parental, drop.pars, env) {
   
-  if(!all(unique(sort(user.data$enviro)) == c(-1,1))){
+  if(!all(unique(sort(user.data$enviro)) %in% c(-1,1))){
     print("Scaling environmental variabel to be on a scale of -1, 1")
     user.data$enviro <- ReScale2(user.data$enviro)
   }
