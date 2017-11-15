@@ -1,3 +1,64 @@
+library(SAGA2)
+dat1 <- read.csv("pm.sin.29.csv", as.is=T)
+res1 <- LCA(dat1)
+plot(res1)
+
+
+dat1 <- read.csv("ba.sq.26.csv", as.is=T)
+dat2 <- read.csv("ba.sq.29.csv", as.is=T)
+dat3 <- read.csv("ba.sq.35.csv", as.is=T)
+dat4 <- read.csv("ba.sq.comb.csv", as.is=T)
+
+dat5 <- read.csv("bho.sq.26.csv", as.is=T)
+dat6 <- read.csv("bho.sq.29.csv", as.is=T)
+dat7 <- read.csv("bho.sq.35.csv", as.is=T)
+dat8 <- read.csv("bho.sq.comb.csv", as.is=T)
+
+dat9  <- read.csv("da.sq.26.csv", as.is=T)
+dat10 <- read.csv("da.sq.29.csv", as.is=T)
+dat11 <- read.csv("da.sq.35.csv", as.is=T)
+dat12 <- read.csv("da.sq.comb.csv", as.is=T)
+
+res1 <- LCA(dat1)
+res2 <- LCA(dat2)
+res3 <- LCA(dat3)
+res4 <- LCA(dat4)
+
+res5 <- LCA(dat5)
+res6 <- LCA(dat6)
+res7 <- LCA(dat7)
+res8 <- LCA(dat8)
+
+res9  <- LCA(dat9)
+res10 <- LCA(dat10)
+res11 <- LCA(dat11)
+res12 <- LCA(dat12)
+
+
+par(mfcol=c(4,3))
+plot(res1, main=paste("ba x sq 26C:", length(res1$best.models), "models"))
+plot(res2, main=paste("ba x sq 29C", length(res2$best.models), "models"))
+plot(res3, main=paste("ba x sq 35C", length(res3$best.models), "models"))
+plot(res4, main=paste("ba x sq all data", length(res4$best.models), "models"))
+plot(res5, main=paste("bho x sq 26C", length(res5$best.models), "models"))
+plot(res6, main=paste("bho x sq 29C", length(res6$best.models), "models"))
+plot(res7, main=paste("bho x sq 35C", length(res7$best.models), "models"))
+plot(res8, main=paste("bho x sq all data", length(res8$best.models), "models"))
+plot(res9, main=paste("da x sq 26C", length(res9$best.models), "models"))
+plot(res10, main=paste("da x sq 29C", length(res10$best.models), "models"))
+plot(res11, main=paste("da x sq 35C", length(res11$best.models), "models"))
+plot(res12, main=paste("da x sq all data", length(res12$best.models), "models"))
+
+
+
+
+
+
+
+
+
+
+
 # figure out if how we can add vectors of parental strains
 # this would allow us to handle pooled strains like in the 
 # mojavensis line
