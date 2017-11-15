@@ -11,6 +11,14 @@ plot.genarch <- function(x, min.vi = .5, main = NULL, cex.axis = 1,
   x <- as.data.frame(matrix(x, length(x) / 3, 3))
   colnames(x) <- c("estimates", "SE", "vi")
   row.names(x) <- colnames(data$estimates)[-1]
+  
+  if(sum(x$vi >= min.vi) == 0){
+    cat(paste("\nThe min.vi of", min.vi, 
+          "is larger than those observed", 
+          "in your dataset. Decrease the supplied",
+          "value of min.vi to plot your results.\n"))
+    stop()
+  }
   data <- x[x$vi >= min.vi, ]
   # get some extra room
   par(mar=c(2, 2, 2, 6))
