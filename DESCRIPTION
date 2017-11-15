@@ -12,6 +12,6 @@ Description: Implements an information theory approach to the analysis of line
     line cross analysis plots.
 License: GPL (>= 2)
 URL: https://github.com/coleoguy/SAGA
-Imports: plotrix, viridis
+Imports: plotrix, viridis, gtools
 Suggests: knitr
 VignetteBuilder: knitr
