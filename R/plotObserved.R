@@ -1,37 +1,41 @@
-plotObserved <- function(data, results, pch=NULL, col=NULL, xlab=NULL, ylab=NULL, main=NULL, SE=T){
+plotObserved <- function(data, SE=T, pch=NULL, col=NULL, xlab=NULL, ylab=NULL, main=NULL){
   .pardefault <- par(no.readonly = T)
   
-  genome.perc <- read.csv(file = system.file("genome.scale.csv", package = "SAGA"))[,2:3]
-  x <- cbind(data, genome.perc[data[,1],2])
-  colnames(x)[4] <- "gen.perc"
+  # fill in some defaults
   if(is.null(pch)) pch <- 16
   if(is.null(col)) col <- "black"
   if(is.null(xlab)) xlab <- "% P1 Genome"
   if(is.null(ylab)) ylab <- "Phenotype Measure"
-  if(length(unique(x[,4])) != length(x[,4])){
-    xvals <- jitter(x[,4])
+  
+  # get the x and y
+  x <- PrepareCmatrix(user.data = data, SCS = "XY", 
+                      parental = "calc", drop.pars = NULL, 
+                      getP=T, messages=F)$p1a * 100
+  y <- data$mean
+  se <- data$SE
+  
+  # jitter the x values since they are often the same
+  if(length(unique(x)) != length(x)){
+     x <- jitter(x)
   }else{
-    xvals <- x[,4]
+     x <- x
   }
+  
   if(SE==T){
-    yvals <- vector()
-    for(i in 1:nrow(x)){
-      high <- sum(x[i,2:3])
-      if(i == 1) yvals[i] <- sum(x[i,2:3])
-      low <- x[i,2] - x[i,3]
-      if(high > max(yvals)) yvals <- c(yvals, high)
-      if(low  < min(yvals)) yvals <- c(yvals, low)
-    }
-    high <- max(yvals)
-    low <- min(yvals)
-    plot(x=xvals, y=x[,2], ylab=ylab, xlab=xlab, xaxt="n", pch=pch, main=main, ylim=c(low,high))
-    for(i in 1:nrow(x)){
-      lines(x=rep(xvals[i], 2), y= c(sum(x[i,2:3]), x[i,2] - x[i,3]))
+
+    high <- max(y + se)
+    low <- min(y - se)
+    
+    plot(x=x, y=y, 
+         ylab=ylab, xlab=xlab, 
+         xaxt="n", pch=pch, main=main, ylim=c(low,high), xlim=c(0,100))
+    for(i in 1:length(x)){
+      lines(x=rep(x[i], 2), y= c((y[i] + se[i]), (y[i] - se[i])))
     }
   }else{
-    plot(x=xvals, y=x[,2], ylab=ylab, xlab=xlab, xaxt="n", pch=pch, main=main)
+    plot(x=x, y=y, ylab=ylab, xlab=xlab, xaxt="n", pch=pch, main=main)
   }
   axis(side=1,labels=c(0,50,100), at=c(0,50,100))
-  abline(glm(x[,2]~x[,4], weights = data[, 2] ^ - 2), lty="dashed", col="blue")
+  abline(glm(y~x, weights = se), lty="dashed", col="blue")
   par(.pardefault)
 }

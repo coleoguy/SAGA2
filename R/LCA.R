@@ -7,6 +7,11 @@ LCA <- function(data,
                 drop.pars = NULL,
                 max.pars = NULL,
                 Cmatrix = NULL){
+  # lets deal with cross names being treated as factors
+  if(is.factor(data$cross)){
+    data$cross <- unlist(lapply(data$cross, as.character))
+  }
+  
   # validate the incoming arguments and data
   validateData(SCS, user.data = data, Cmatrix)
   # if no custom matrix is supplied build a cmatrix based

@@ -1,7 +1,9 @@
-PrepareCmatrix <- function(user.data, SCS, parental, drop.pars, env) {
+PrepareCmatrix <- function(user.data, SCS, parental, drop.pars, env, getP=F, messages=T) {
   
   if(!all(unique(sort(user.data$enviro)) %in% c(-1,1))){
-    print("Scaling environmental variable to be on a scale of -1, 1")
+    if(messages == T){
+      print("Scaling environmental variable to be on a scale of -1, 1")
+    }
     user.data$enviro <- ReScale2(user.data$enviro)
   }
   
@@ -218,5 +220,10 @@ PrepareCmatrix <- function(user.data, SCS, parental, drop.pars, env) {
   ##### end of cmatrix expansion #####
   
   ##### return the gold to the user #####
-  return(cmatrix)
+  if(getP == F){
+    return(cmatrix)
+  }
+  if(getP == T){
+    return(pmatrix)
+  }
 }
