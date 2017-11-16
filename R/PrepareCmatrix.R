@@ -1,11 +1,19 @@
-PrepareCmatrix <- function(user.data, SCS, parental, drop.pars, env, getP=F, messages=T) {
+PrepareCmatrix <- function(user.data, 
+                           SCS, 
+                           parental, 
+                           drop.pars, 
+                           env, 
+                           getP=F, 
+                           messages=T) {
   
+  ##### Scale environmental factors #####
   if(!all(unique(sort(user.data$enviro)) %in% c(-1,1))){
     if(messages == T){
       print("Scaling environmental variable to be on a scale of -1, 1")
     }
     user.data$enviro <- ReScale2(user.data$enviro)
   }
+  ##### Environmental factors are now scaled #####
   
   ##### Now we create an empty dataframe for the P-matrix #####
   pmatrix <- as.data.frame(matrix(, nrow(user.data), 7))
@@ -226,4 +234,5 @@ PrepareCmatrix <- function(user.data, SCS, parental, drop.pars, env, getP=F, mes
   if(getP == T){
     return(pmatrix)
   }
+  ##### we should be done #####
 }
