@@ -57,6 +57,9 @@ validateData <- function(SCS, user.data, Cmatrix){
   if (!is.numeric(user.data$SE)) {
     stop("Standard Errors must be numeric values")
   }
+  # If the user supplies no environmental values fill with 1
+  if(all(is.na(user.data$enviro))) user.data$enviro <- 1
+  
   # Test that environment is between -1 and 1
   if (!is.numeric(user.data$enviro)){
     stop("Environment values need to be numeric values.  If you have discrete
