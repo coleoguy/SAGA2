@@ -1,5 +1,6 @@
 library(SAGA2)
-dat1 <- read.csv("pm.sin.29.csv", as.is=T)
+dat1 <- read.csv("inst/pm.sin.29.csv", as.is=T)
+dat1$enviro <- NA
 res1 <- LCA(dat1)
 plot(res1)
 
