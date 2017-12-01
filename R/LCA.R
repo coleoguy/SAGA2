@@ -18,7 +18,7 @@ LCA <- function(data,
   # on the user data and arguments supplied
   if(is.null(Cmatrix)){
     Cmatrix <- PrepareCmatrix(user.data = data,
-                              SCS = SCS,
+                              SCS = SCS, env = env,
                               drop.pars = drop.pars,
                               parental = parental)
   }
