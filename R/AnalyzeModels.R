@@ -215,7 +215,7 @@ AnalyzeModels <- function(data, SCS, Cmatrix, crosses,
   final.results[[1]] <- mod.results
   final.results[[2]] <- best.models
   final.results[[3]] <- best.eqns.w
-  final.results[[4]] <- as.data.frame(results)
+  final.results[[4]] <- results
   final.results[[5]] <- daicc
   final.results[[6]] <- new.vars
   final.results[[7]] <- cbind(crosses, Cmatrix)
