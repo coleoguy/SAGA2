@@ -3,7 +3,6 @@ PrepareCmatrix <- function(user.data,
                            parental, 
                            drop.pars, 
                            env, 
-                           getP=F, 
                            messages=T) {
   
   ##### Scale environmental factors #####
@@ -328,11 +327,7 @@ PrepareCmatrix <- function(user.data,
   ##### end of cmatrix expansion #####
   
   ##### return the gold to the user #####
-  if(getP == F){
     return(cmatrix)
-  }
-  if(getP == T){
     return(pmatrix)
-  }
   ##### we should be done #####
 }

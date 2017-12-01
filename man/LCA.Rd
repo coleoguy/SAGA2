@@ -34,22 +34,10 @@
 
 In previous LCA work maternal effects have always been modeled as the autosomal additive or dominance status of the dam.  To the degree that the phenotype of interest is not controlled by either autosomal additive or dominance effects this approach will fail to capture the true nature of maternal effects.  As an alternative we offer the \code{parental} argument.  If supplied with the value \code{"obs"}  The phenotypes of all cohorts will be rescaled on an interval of -1 to 1. These values will then function as the expected contribution of either maternal or paternal effects in offspring from a cohort. 
 
-In some experiments cohorts are combined to be used as parents in a subsequent cross. For instance an F1 and recipricol F1 might be combined and then backcrossed to each parent.  To indicate such a pooling of lines multiple rows of the user data can be indicated as either the sire or dam of a subsequent cohort.  Simple separate with a . and now spaces.  The example dataset shows what this should look like.
-
 \strong{Example Data Set}
 
 \tabular{lllllll}{
-    \strong{cohort} \tab \strong{mean} \tab \strong{SE} \tab \strong{sex} \tab \strong{enviro} \tab \strong{sire} \tab \strong{dam}\cr
-    P1 \tab 32 \tab .45 \tab E \tab 32 \tab 1 \tab 1\cr
-    P2 \tab 16 \tab .65 \tab E \tab 32 \tab 2 \tab 2\cr
-    F1 \tab 24 \tab 1.2 \tab E \tab 32 \tab 1 \tab 2\cr
-    rF1 \tab 27 \tab 3.1 \tab E \tab 32 \tab 2 \tab 1\cr
-    BC1a \tab 24 \tab 1.2 \tab E \tab 32 \tab 1 \tab 3.4\cr
-    P1 \tab 29 \tab .01 \tab E \tab 29 \tab 6 \tab 6\cr
-    P2 \tab 12 \tab .98 \tab E \tab 29 \tab 7 \tab 7\cr
-    F1 \tab 22 \tab .8 \tab E \tab 29 \tab 6 \tab 7\cr
-    rF1 \tab 21 \tab 2.4 \tab E \tab 29 \tab 7 \tab 6\cr
-    rBC1a \tab 20 \tab .56 \tab E \tab 29 \tab 8.9 \tab 6
+    \strong{cohort} \tab \strong{mean} \tab \strong{SE} \tab \strong{sex} \tab \strong{enviro} \tab \strong{sire} \tab \strong{dam}\cr P1 \tab 32 \tab .45 \tab E \tab 32 \tab 1 \tab 1\cr P2 \tab 16 \tab .65 \tab E \tab 32 \tab 2 \tab 2\cr F1 \tab 24 \tab 1.2 \tab E \tab 32 \tab 1 \tab 2\cr rF1 \tab 27 \tab 3.1 \tab E \tab 32 \tab 2 \tab 1\cr BC1a \tab 24 \tab 1.2 \tab E \tab 32 \tab 1 \tab 3\cr P1 \tab 29 \tab .01 \tab E \tab 29 \tab 6 \tab 6\cr P2 \tab 12 \tab .98 \tab E \tab 29 \tab 7 \tab 7\cr F1 \tab 22 \tab .8 \tab E \tab 29 \tab 6 \tab 7\cr rF1 \tab 21 \tab 2.4 \tab E \tab 29 \tab 7 \tab 6\cr rBC1a \tab 20 \tab .56 \tab E \tab 29 \tab 8 \tab 6
     }
  \itemize{
      \item Cohorts can be named in any way the user whishes but P1 and P2 are standard names that must be used for the two original strains.  If these are not present in the user data then the software will not be able to construct a C-matrix.
