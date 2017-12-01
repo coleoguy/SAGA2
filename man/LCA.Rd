@@ -26,7 +26,6 @@
   \item{model.sum}{This is the sum of the probability of the models to be included}
   \item{max.models}{The maximum number of fitted models to return from the function.  This is included as an option to allow analysis of large model space on computers with limited RAM.}
   \item{drop.pars}{Vector of strings with the names of composite genetic effects to ignore.}
-  }
   \item{max.pars}{Optional numeric value indicating the maximum number of parameters for equations evaluated.}
   \item{Cmatrix}{Optional matrix describing contribution of genetic effects in the cohorts being analyzed.}
   }
