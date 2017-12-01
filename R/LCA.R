@@ -12,6 +12,11 @@ LCA <- function(data,
     data$cross <- unlist(lapply(data$cross, as.character))
   }
   
+  # lets deal with F in sex being treated as FALSE
+  if(is.logical(data$sex)){
+    data$sex <- rep("F", length(data$sex))
+  }
+  
   # validate the incoming arguments and data
   validateData(SCS, user.data = data, Cmatrix)
   # if no custom matrix is supplied build a cmatrix based
