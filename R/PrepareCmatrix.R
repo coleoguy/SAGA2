@@ -96,7 +96,6 @@ PrepareCmatrix <- function(user.data,
   # get unfilled columns
   to.fill <- which(!complete.cases(pmatrix))
   for(i in to.fill){
-    print(i)
     # this chunk is for rows that dont have any pooled parents
     if(user.data$sire[i] %% 1 == 0 & user.data$dam[i] %% 1 == 0){
       pmatrix$p1a[i]   <- (pmatrix$p1a[user.data$sire[i]] + 
