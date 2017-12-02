@@ -6,7 +6,8 @@ LCA <- function(data,
                 max.models = 300000,
                 drop.pars = NULL,
                 max.pars = NULL,
-                Cmatrix = NULL){
+                Cmatrix = NULL,
+                ret.all = FALSE){
   # lets deal with cross names being treated as factors
   if(is.factor(data$cross)){
     data$cross <- unlist(lapply(data$cross, as.character))
@@ -35,11 +36,12 @@ LCA <- function(data,
   result <- AnalyzeModels(data = data,
                           Cmatrix = Cmatrix,
                           crosses = crosses,
-                           SCS = SCS,
-                           parental = parental,
-                           env = env,
-                           model.sum = model.sum,
-                           max.models = max.models,
-                           max.pars = max.pars)
+                          SCS = SCS,
+                          parental = parental,
+                          env = env,
+                          model.sum = model.sum,
+                          max.models = max.models,
+                          max.pars = max.pars,
+                          ret.all = ret.all)
   return(result)
 }

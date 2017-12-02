@@ -1,6 +1,7 @@
 AnalyzeModels <- function(data, SCS, Cmatrix, crosses, 
                           parental, env, 
-                          model.sum, max.models, max.pars){
+                          model.sum, max.models, max.pars,
+                          ret.all){
   have.data <- paste(colnames(Cmatrix)[-1], collapse = ", ")
   cat(paste("The composite genetic effects that will be tested are: \n", 
             have.data, collapse = ", "), "\n\n")
@@ -212,7 +213,8 @@ AnalyzeModels <- function(data, SCS, Cmatrix, crosses,
     mod.results <- mod.results[order(waic, decreasing = T)[1:max.models]]
     daicc <- daicc[order(daicc, decreasing =F)[1:max.models]]
   }
-  final.results[[1]] <- mod.results
+  if(ret.all == TRUE) final.results[[1]] <- mod.results
+  if(ret.all == FALSE) final.results[[1]] <- NULL
   final.results[[2]] <- best.models
   final.results[[3]] <- best.eqns.w
   final.results[[4]] <- results
