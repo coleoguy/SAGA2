@@ -7,7 +7,8 @@ LCA <- function(data,
                 drop.pars = NULL,
                 max.pars = NULL,
                 Cmatrix = NULL,
-                ret.all = FALSE){
+                ret.all = FALSE,
+                messages = TRUE){
   # lets deal with cross names being treated as factors
   if(is.factor(data$cross)){
     data$cross <- unlist(lapply(data$cross, as.character))
@@ -42,6 +43,7 @@ LCA <- function(data,
                           model.sum = model.sum,
                           max.models = max.models,
                           max.pars = max.pars,
-                          ret.all = ret.all)
+                          ret.all = ret.all,
+                          messages = messages)
   return(result)
 }

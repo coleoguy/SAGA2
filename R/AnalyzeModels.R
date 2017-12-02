@@ -1,10 +1,12 @@
 AnalyzeModels <- function(data, SCS, Cmatrix, crosses, 
                           parental, env, 
                           model.sum, max.models, max.pars,
-                          ret.all){
+                          ret.all, messages = T){
   have.data <- paste(colnames(Cmatrix)[-1], collapse = ", ")
-  cat(paste("The composite genetic effects that will be tested are: \n", 
+  if(messages == T){
+    cat(paste("The composite genetic effects that will be tested are: \n", 
             have.data, collapse = ", "), "\n\n")
+  }
   # calcualte the potential size of model space
   # the final -2 is because we will always be including the mean so we have
   # one less choice to make
@@ -12,8 +14,10 @@ AnalyzeModels <- function(data, SCS, Cmatrix, crosses,
                                1:(nrow(Cmatrix) - 2)))
   if(!is.null(max.pars)) mod.space.size <- sum(choose((ncol(Cmatrix) -1), 1:max.pars))
   # warn the user if the model space is very large
-  if(mod.space.size > 5000){
-    cat(paste("Since there are ", mod.space.size, " possible models this may take a bit:\n", sep=""))
+  if(messages == T){
+    if(mod.space.size > 5000){
+      cat(paste("Since there are ", mod.space.size, " possible models this may take a bit:\n", sep=""))
+    }
   }
   # generate all possible models storing each matrix in a list
   pos.cols <- 2:ncol(Cmatrix)             # col that could be used
@@ -25,12 +29,12 @@ AnalyzeModels <- function(data, SCS, Cmatrix, crosses,
   # many important factors.  So one solution is simply to allow users to set a max
   # model size this makes things fairly easy to handle
   if(!is.null(max.pars)) max.par <- max.pars
-  cat(paste("Generating Models"))
+  if(messages == T) cat(paste("Generating Models"))
   if(length(pos.cols) < max.par){
     max.par <- length(pos.cols)
   }
   for(i in 1:max.par){                     # different number of par models
-    cat(".")
+    if(messages == T) cat(".")
     foo <- combn(pos.cols, i)              # all pos models with i variables
     # this loop just places the models generate with i variables into the list
     # of all possible models.  Models are described by the columns they include
@@ -71,15 +75,21 @@ AnalyzeModels <- function(data, SCS, Cmatrix, crosses,
       aic[counter] <- mod.results[[counter]]$aic
       counter <- counter + 1
     }
-    if(i / x == round(i / x)) cat(paste("\n", i))
+    if(messages == T){
+      if(i / x == round(i / x)){
+        cat(paste("\n", i))
+      }
+    }
   }
   ## need to report the number of models thrown out due to 
   ## high covariance ~ singularity
-  if(i > counter){
-    cat(paste("\n", i - (counter - 1), 
-              " models were removed due to high covariances \n",
-              "or linear relationships between predictor variables.  \n", "The remaining ", 
-              counter - 1, " models have been evaluated.\n\n", sep = ""))
+  if(messages == T){
+    if(i > counter){
+      cat(paste("\n", i - (counter - 1), 
+                " models were removed due to high covariances \n",
+                "or linear relationships between predictor variables.  \n", "The remaining ", 
+                counter - 1, " models have been evaluated.\n\n", sep = ""))
+    }
   }
   # in the unrealistic situation where there was a model that predicted the
   # data perfectly we would get -Inf for the AIC should only be an issue in 
@@ -117,10 +127,12 @@ AnalyzeModels <- function(data, SCS, Cmatrix, crosses,
   }
   best.models.ind <- order(waic, decreasing = T, na.last = F)[1:i]
   best.models <- mod.results[best.models.ind]
-  cat(paste("\nAICc weights were used to select the minimum number of models ",
-            "whose weights sum \nto greater than ", 
-            model.sum * 100, "% this model set includes ", length(best.models), 
-            " model(s)\n", sep = ""))
+  if(messages == T){
+    cat(paste("\nAICc weights were used to select the minimum number of models ",
+              "whose weights sum \nto greater than ", 
+              model.sum * 100, "% this model set includes ", length(best.models), 
+              " model(s)\n", sep = ""))
+  }
   #lets calculate variable importance
   #which equations are being used
   best.eqns <- eqns[as.numeric(names(best.models))]
