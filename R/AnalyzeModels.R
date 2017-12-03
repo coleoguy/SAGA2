@@ -63,19 +63,17 @@ AnalyzeModels <- function(data,
   if(length(eqns) > 1000) x <- 500
   if(length(eqns) > 10000) x <- 5000
   # now we test each model
-  mod.results <- list()                  # stores glm results
-  num.pars <- dev <- aic <- vector()     # stores various useful values
-  # we need a counter because redundant models arrise.  These originate because
-  # some components will have high covariance depending on the lines included
-  # in the dataset.  The glm function automatically throws these variables
-  # resulting in fitting the same model more than once.
-  
+
   # We need to preallocate these variables
   # mod.results, num.pars, dev, aic
   mod.results <- vector(mode = "list", length = length(eqns))
   num.pars <- dev <- aic <- vector(length=length(eqns))
   
-  counter <- 1
+  # we need a counter because redundant models arrise.  These originate because
+  # some components will have high covariance depending on the lines included
+  # in the dataset.  The glm function automatically throws these variables
+  # resulting in fitting the same model more than once.
+  counter <- 0
   for(i in 1:length(eqns)){
     # generate the matrix for the current model
     test.mat <- as.matrix(Cmatrix[, c(1, eqns[[i]])])
@@ -84,6 +82,7 @@ AnalyzeModels <- function(data,
     # this if statement will bypass a model with a singularity
     # 1 NA will be generated for the line mean any additional are sign of sing.
     if(sum(is.na(temp.mod$coef)) < 2){
+      counter <- counter + 1
       # name model results as eqns
       mod.results[[counter]] <- temp.mod
       names(mod.results)[counter] <- i
@@ -93,20 +92,15 @@ AnalyzeModels <- function(data,
       dev[counter] <- mod.results[[counter]]$dev
       # record the AIC of the models
       aic[counter] <- mod.results[[counter]]$aic
-      counter <- counter + 1
     }
-    if(messages == T){
-      if(i / x == round(i / x)){
-        cat(paste("\n", i))
-      }
-    }
+    if(messages == T) if(i / x == round(i / x)) cat(paste("\n", i))
   }
   
   # Get rid of excess preallocation
-  mod.results <- mod.results[1:(counter-1)]
-  num.pars <- num.pars[1:(counter-1)]
-  dev <-  dev[1:(counter-1)]
-  aic <- aic[1:(counter-1)]
+  mod.results <- mod.results[1:counter]
+  num.pars <- num.pars[1:counter]
+  dev <-  dev[1:counter]
+  aic <- aic[1:counter]
   
   
   
