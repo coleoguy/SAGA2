@@ -1,12 +1,22 @@
-AnalyzeModels <- function(data, SCS, Cmatrix, crosses, 
-                          parental, env, 
-                          model.sum, max.models, max.pars,
-                          ret.all, messages = T){
+AnalyzeModels <- function(data, 
+                          SCS, 
+                          Cmatrix, 
+                          crosses, 
+                          parental, 
+                          env, 
+                          model.sum, 
+                          max.models, 
+                          max.pars,
+                          ret.all, 
+                          messages){
+  
+  # report the composite genetic effects being explored
   have.data <- paste(colnames(Cmatrix)[-1], collapse = ", ")
   if(messages == T){
     cat(paste("The composite genetic effects that will be tested are: \n", 
             have.data, collapse = ", "), "\n\n")
   }
+  
   # calcualte the potential size of model space
   # the final -2 is because we will always be including the mean so we have
   # one less choice to make
@@ -19,11 +29,13 @@ AnalyzeModels <- function(data, SCS, Cmatrix, crosses,
       cat(paste("Since there are ", mod.space.size, " possible models this may take a bit:\n", sep=""))
     }
   }
+  
   # generate all possible models storing each matrix in a list
   pos.cols <- 2:ncol(Cmatrix)             # col that could be used
   eqns <- list()                              # store the eqns
   counter <- 1                                # index for eqns
   max.par <- nrow(Cmatrix) - 2            #
+  
   # if a user has very many cohorts model space can become problematically large
   # however I think that actually very few datasets support >>large models with 
   # many important factors.  So one solution is simply to allow users to set a max
@@ -33,9 +45,11 @@ AnalyzeModels <- function(data, SCS, Cmatrix, crosses,
   if(length(pos.cols) < max.par){
     max.par <- length(pos.cols)
   }
-  for(i in 1:max.par){                     # different number of par models
+  # different number of par models
+  for(i in 1:max.par){                     
     if(messages == T) cat(".")
-    foo <- combn(pos.cols, i)              # all pos models with i variables
+    foo <- combn(pos.cols, i)              
+    # all pos models with i variables
     # this loop just places the models generate with i variables into the list
     # of all possible models.  Models are described by the columns they include
     for(j in 1:ncol(foo)){
@@ -55,6 +69,12 @@ AnalyzeModels <- function(data, SCS, Cmatrix, crosses,
   # some components will have high covariance depending on the lines included
   # in the dataset.  The glm function automatically throws these variables
   # resulting in fitting the same model more than once.
+  
+  # We need to preallocate these variables
+  # mod.results, num.pars, dev, aic
+  mod.results <- vector(mode = "list", length = length(eqns))
+  num.pars <- dev <- aic <- vector(length=legnth(eqns))
+  
   counter <- 1
   for(i in 1:length(eqns)){
     # generate the matrix for the current model
@@ -81,6 +101,17 @@ AnalyzeModels <- function(data, SCS, Cmatrix, crosses,
       }
     }
   }
+  
+  # Get rid of excess preallocation
+  mod.results[vapply(mod.results, Negate(is.null), NA)]
+  x <- length(mod.results)
+  num.pars <- num.pars[1:x]
+  dev <-  dev[1:x]
+  aic <- aic[1:x]
+  
+  
+  
+  
   ## need to report the number of models thrown out due to 
   ## high covariance ~ singularity
   if(messages == T){
