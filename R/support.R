@@ -23,7 +23,7 @@ validateData <- function(SCS, user.data, Cmatrix){
       # is it even a matrix
       if(!is.matrix(Cmatrix)) stop("Your supplied c-matrix is not a matrix")
       # does it contain the cohorts we need
-      if(!sum(data[,1] %in% Cmatrix[,1]) == nrow(data)){
+      if(!sum(user.data[,1] %in% Cmatrix[,1]) == nrow(user.data)){
         stop("The cross names in your data don't 
              match those in your user supplied c-matrix")
       }
