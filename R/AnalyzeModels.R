@@ -10,12 +10,6 @@ AnalyzeModels <- function(data,
                           ret.all, 
                           messages){
   
-  # report the composite genetic effects being explored
-  have.data <- paste(colnames(Cmatrix)[-1], collapse = ", ")
-  if(messages == T){
-    cat(paste("The composite genetic effects that will be tested are: \n", 
-            have.data, collapse = ", "), "\n\n")
-  }
   
   # calcualte the potential size of model space
   # the final -2 is because we will always be including the mean so we have

@@ -21,6 +21,7 @@ LCA <- function(data,
   
   # validate the incoming arguments and data
   validateData(SCS, user.data = data, Cmatrix)
+  
   # if no custom matrix is supplied build a cmatrix based
   # on the user data and arguments supplied
   if(is.null(Cmatrix)){
@@ -29,10 +30,18 @@ LCA <- function(data,
                               drop.pars = drop.pars,
                               parental = parental)
   }
+  
   # remove CGEs in the cmatrix that can't be analyzed
   cmat.temp <- CleanCmatrix(Cmatrix)
   Cmatrix <- cmat.temp[[1]]
   crosses <- cmat.temp[[2]]
+  
+  # report the composite genetic effects being explored
+  have.data <- paste(colnames(Cmatrix)[-1], collapse = ", ")
+  if(messages == T) cat(paste("The composite genetic effects 
+                              that will be tested are: \n",
+                              have.data, collapse = ", "), "\n\n")
+  
   # analyze the data based on the cmatrix
   result <- AnalyzeModels(data = data,
                           Cmatrix = Cmatrix,
