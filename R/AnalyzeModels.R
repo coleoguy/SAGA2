@@ -103,10 +103,10 @@ AnalyzeModels <- function(data,
   }
   
   # Get rid of excess preallocation
-  mod.results <- mod.results[1:counter]
-  num.pars <- num.pars[1:counter]
-  dev <-  dev[1:counter]
-  aic <- aic[1:counter]
+  mod.results <- mod.results[1:(counter-1)]
+  num.pars <- num.pars[1:(counter-1)]
+  dev <-  dev[1:(counter-1)]
+  aic <- aic[1:(counter-1)]
   
   
   
