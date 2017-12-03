@@ -66,10 +66,14 @@ validateData <- function(SCS, user.data, Cmatrix){
        environmental states use -1 and 1.")
   }
   # Test that sire and dam values are less than num of rows
-  if (user.data$sire > NROW(user.data) || user.data$dam > NROW(user.data)) {
-    stop("Sire and Dam row values are invalid.")
+  if(is.null(Cmatrix)){
+    if (user.data$sire > NROW(user.data) || user.data$dam > NROW(user.data)) {
+      stop("Sire and Dam row values are invalid.")
+    }
   }
 }
+  
+
 ######### End of validation testing ####
 
 ######### Clean the Cmatrix #############

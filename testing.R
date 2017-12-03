@@ -48,10 +48,35 @@ plot(res12, main=paste("da x sq all data", length(res12$best.models), "models"),
 
 
 
+# old SAGA
+Aa, Ad, Xa, Xd, Ca, Mea, Med, AaAa, AaAd, AdAd, XaAa, CaAa, XaAd, XdAa, XdAd, CaAd, CaXa, CaXd
+Aa, Ad, Xa, Xd, Ca, Mea, Med, AaAa, AaAd, AdAd, AaXa, AaCa, AdXa, AaXd, AdXd, AdCa, XaCa, XdCa, XaXa, XaXd, XdXd 
+# lets compare 2 versions w/o preallocation
+dat1 <- read.csv("silene.ovules.csv", as.is=T)
+s.time <- Sys.time()
+res4 <- LCA(dat1, max.pars=3)
+e.time <- Sys.time()
+e.time-s.time
+# 10.419
+# 10.498
+# 10.69
+# 10.79
+# 11.76
+# 10.78
+# 10.89
+# 10.47
 
 
-
-
-
-
-
+library(devtools)
+install_github('coleoguy/SAGA2')
+library(SAGA2)
+dat1 <- read.csv("silene.ovules.csv", as.is=T)
+s.time <- Sys.time()
+res4 <- LCA(dat1, max.pars=4)
+e.time <- Sys.time()
+e.time-s.time
+# 10.19
+# 11.24
+# 10.94
+# 9.962
+#

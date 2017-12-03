@@ -4,7 +4,7 @@
 \alias{per.inf}
 \alias{dar.bho}
 \alias{sin.cro}
-\alias{PH}
+\alias{SC}
 \alias{SL}
 \alias{SR}
 
@@ -20,11 +20,9 @@ per.inf: Productivity of crosses involving Tribolium castaneum from Peru and Por
 
 sin.cro: Productivity of crosses involving Tribolium castaneum from Malaysia and Croatia [1]
 
-PH: Plant height data for Nicotiana rustica [2]
+sc.humans: skin color data for humans [2]
 
-SL: Sperm length data for male Drosophila mojavensis line cross  analysis [3]
 
-SR: Sperm receptacle length data for female Drosophila mojavensis line cross analysis [3]
 }
 \usage{data(ban.osa)}
 \value{A data frame with rows for each cohort and 3 columns:

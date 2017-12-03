@@ -55,10 +55,23 @@ AnalyzeModels <- function(data,
   # The glm function automatically throws these variables
   # resulting in fitting the same model more than once.
   counter <- 0
+
+  # if the user supplies the matrix make sure it is numeric
+  if(!is.null(Cmatrix)){
+    if(is.character(Cmatrix[1, 1])){
+      class(Cmatrix) <- "numeric"
+    }
+  }
   
+  
+    
   for(i in 1:length(eqns)){
     # generate the matrix for the current model
     test.mat <- as.matrix(Cmatrix[, c(1, eqns[[i]])])
+    
+    
+    
+    
     # fit the model weight is equal to the inverse of the square of the SE
     temp.mod <- glm(data$mean ~ test.mat, weights = data$SE ^ - 2)
     # this if statement will bypass a model with a singularity

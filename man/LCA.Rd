@@ -2,8 +2,15 @@
 \alias{LCA}
 \title{Model Averaged Line Cross Analysis}
 \description{Analyze all possible genetic architecture models based on mean phenotypes from line cross data.}
-\usage{LCA(data, SCS = "XY", parental = "calc", env = FALSE, model.sum = .95,
-           max.models = 300000, drop.pars = NULL, max.pars = NULL, Cmatrix = NULL)}
+\usage{LCA(data, 
+    SCS = "XY", 
+    parental = "calc", 
+    env = FALSE, 
+    model.sum = .95,
+    max.models = 300000, 
+    drop.pars = NULL, 
+    max.pars = NULL, 
+    Cmatrix = NULL)}
 \arguments{
   \item{data}{a data frame with the 7 columns:
   \itemize{
