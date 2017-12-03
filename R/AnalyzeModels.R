@@ -72,8 +72,8 @@ AnalyzeModels <- function(data,
   
   # We need to preallocate these variables
   # mod.results, num.pars, dev, aic
-  mod.results <- vector(mode = "list", length = length(eqns))
-  num.pars <- dev <- aic <- vector(length=length(eqns))
+  # mod.results <- vector(mode = "list", length = length(eqns))
+  # num.pars <- dev <- aic <- vector(length=length(eqns))
   
   counter <- 1
   for(i in 1:length(eqns)){
@@ -103,11 +103,11 @@ AnalyzeModels <- function(data,
   }
   
   # Get rid of excess preallocation
-  mod.results[vapply(mod.results, Negate(is.null), NA)]
-  x <- length(mod.results)
-  num.pars <- num.pars[1:x]
-  dev <-  dev[1:x]
-  aic <- aic[1:x]
+  # mod.results[vapply(mod.results, Negate(is.null), NA)]
+  # x <- length(mod.results)
+  # num.pars <- num.pars[1:x]
+  # dev <-  dev[1:x]
+  # aic <- aic[1:x]
   
   
   
@@ -164,21 +164,25 @@ AnalyzeModels <- function(data,
               model.sum * 100, "% this model set includes ", length(best.models), 
               " model(s)\n", sep = ""))
   }
+  
   #lets calculate variable importance
   #which equations are being used
   best.eqns <- eqns[as.numeric(names(best.models))]
   best.eqns.w <- waic[sort(best.models.ind)]
+  
   # now we need to print the model weighted averages and SE
   # lets make a matrix of the calculated values under each model
   par.est <- matrix(0, length(best.eqns), ncol(Cmatrix) + 2)
   colnames(par.est) <- c('eqn', colnames(Cmatrix), 'mw')
   par.est[, 1] <- names(best.models)
   par.est[, 2] <- 1
+  
   # now we need a 1 or 0  if the parameter is in the eqn
   for(i in 1:nrow(par.est)){
     bar <- as.numeric(par.est[i, 1])
     par.est[i, eqns[[bar]] + 1] <- 1
   }
+  
   # now replace 1's with the parameter estimate for each variable
   for(i in 1:nrow(par.est)){
     bar <- best.models[[i]]$coefficients[-2]
@@ -190,15 +194,18 @@ AnalyzeModels <- function(data,
       }
     }
   }
+  
   # add in the aicw
   # best.models has eqn lookup in waic
   names(waic) <- names(mod.results)
   for(i in 1:nrow(par.est)){
     par.est[i, ncol(par.est)] <- waic[names(waic) == par.est[i, 1]]
   }
+  
   # recalculate model waic to sum to 1
   par.est[, 'mw'] <- as.numeric(par.est[, 'mw']) / 
     sum(as.numeric(par.est[, 'mw']))
+  
   # calculate the model weighted parameter estimates
   par.est <- rbind(par.est, rep(0,ncol(par.est)))
   for(i in 2:(ncol(par.est)-1)){
@@ -223,6 +230,7 @@ AnalyzeModels <- function(data,
       }
     }
   }
+  
   # we now have all of the required variables for the uncond. variance est.
   for(i in 2:(ncol(var.est) - 1)){
     if(as.numeric(par.est[nrow(par.est), i]) != 0){
@@ -236,6 +244,7 @@ AnalyzeModels <- function(data,
       var.est[nrow(var.est), i] <- sqrt(sum(foo) ^ 2)
     }
   }
+  
   # now lets make a table with the stuff we want
   results <- matrix(, 2, ncol(Cmatrix))
   colnames(results) <- colnames(Cmatrix)
@@ -243,6 +252,7 @@ AnalyzeModels <- function(data,
                           'Unconditional Standard Error')
   results[1, ] <- par.est[nrow(par.est), 2:(ncol(par.est) - 1)]
   results[2, ] <- var.est[nrow(var.est), 2:(ncol(var.est) - 1)]
+  
   ## prepare the results to be returned to the user
   final.results <- list()
   mod.names <- list()
