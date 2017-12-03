@@ -9,53 +9,40 @@ AnalyzeModels <- function(data,
                           max.pars,
                           ret.all, 
                           messages){
-  
-  
-  # calcualte the potential size of model space
-  # the final -2 is because we will always be including the mean so we have
-  # one less choice to make
-  mod.space.size <- sum(choose(ncol(Cmatrix) -1 , 
-                               1:(nrow(Cmatrix) - 2)))
-  if(!is.null(max.pars)) mod.space.size <- sum(choose((ncol(Cmatrix) -1), 1:max.pars))
-  # warn the user if the model space is very large
-  if(messages == T){
-    if(mod.space.size > 5000){
-      cat(paste("Since there are ", mod.space.size, " possible models this may take a bit:\n", sep=""))
-    }
-  }
-  
-  # generate all possible models storing each matrix in a list
-  pos.cols <- 2:ncol(Cmatrix)             # col that could be used
-  eqns <- list()                              # store the eqns
-  counter <- 1                                # index for eqns
-  max.par <- nrow(Cmatrix) - 2            #
-  
-  # if a user has very many cohorts model space can become problematically large
-  # however I think that actually very few datasets support >>large models with 
-  # many important factors.  So one solution is simply to allow users to set a max
-  # model size this makes things fairly easy to handle
+
+  ##### generate all possible models storing each matrix in a list
+  # col that could be used
+  pos.cols <- 2:ncol(Cmatrix)
+  # store the eqns
+  eqns <- list() 
+  # index for eqns
+  counter <- 1
+  # the maximum allowed parameters
+  max.par <- nrow(Cmatrix) - 2           
+  # allow user to overide max.par  
   if(!is.null(max.pars)) max.par <- max.pars
+  
   if(messages == T) cat(paste("Generating Models"))
   if(length(pos.cols) < max.par){
     max.par <- length(pos.cols)
   }
+  
   # different number of par models
   for(i in 1:max.par){                     
     if(messages == T) cat(".")
     foo <- combn(pos.cols, i)              
-    # all pos models with i variables
-    # this loop just places the models generate with i variables into the list
-    # of all possible models.  Models are described by the columns they include
+    # Models are described by a vector of the columns they include
     for(j in 1:ncol(foo)){
       eqns[[counter]] <- as.vector(foo[,j])
       counter <- counter + 1
     }
   }
+  
   # just the setup for a small counter
-  if(length(eqns) < 101) x <- 50
-  if(length(eqns) > 100) x <- 50
+  if(length(eqns) <= 1000) x <- 50
   if(length(eqns) > 1000) x <- 500
   if(length(eqns) > 10000) x <- 5000
+  
   # now we test each model
 
   # We need to preallocate these variables
@@ -64,10 +51,11 @@ AnalyzeModels <- function(data,
   num.pars <- dev <- aic <- vector(length=length(eqns))
   
   # we need a counter because redundant models arrise.  These originate because
-  # some components will have high covariance depending on the lines included
-  # in the dataset.  The glm function automatically throws these variables
+  # some components will have high covariance 
+  # The glm function automatically throws these variables
   # resulting in fitting the same model more than once.
   counter <- 0
+  
   for(i in 1:length(eqns)){
     # generate the matrix for the current model
     test.mat <- as.matrix(Cmatrix[, c(1, eqns[[i]])])
@@ -109,21 +97,27 @@ AnalyzeModels <- function(data,
                 counter - 1, " models have been evaluated.\n\n", sep = ""))
     }
   }
-  # in the unrealistic situation where there was a model that predicted the
-  # data perfectly we would get -Inf for the AIC should only be an issue in 
-  # simulated data... for these purposes lets just plug in something that is 
-  # equal to the lowest AIC value for models in that same parameter range
-  if(min(aic) == -Inf){
-    aic[aic == -Inf] <- sort(unique(aic))[2] -1
-  }
+  
+  ######## WE SHOULD BE ABLE TO DELETE THIS BLOCK
+  # # in the unrealistic situation where there was a model that predicted the
+  # # data perfectly we would get -Inf for the AIC should only be an issue in 
+  # # simulated data... for these purposes lets just plug in something that is 
+  # # equal to the lowest AIC value for models in that same parameter range
+  # if(min(aic) == -Inf){
+  #   aic[aic == -Inf] <- sort(unique(aic))[2] -1
+  # }
   # calculate aicc and delta aicc
+  ######### DELETE THIS BLOCK
+  
   aicc <- aic + (((2 * num.pars) * (num.pars + 1)) / 
                    (nrow(data) - num.pars))
   daicc <- aicc - min(aicc)
+  
   # this code correctly produces akaike weights 
   waic <- (exp(-.5 * daicc)) / (sum(exp(-.5 * daicc)))
   new.waic <- waic
   new.waic.names <- eqns[as.numeric(names(mod.results))]
+  
   # so now we have a copy of the waics to play with
   new.vars <- matrix(0,(ncol(Cmatrix)-1),2)
   new.vars[,1] <- colnames(Cmatrix)[2:ncol(Cmatrix)]
@@ -134,6 +128,7 @@ AnalyzeModels <- function(data,
       }
     }
   }
+  
   # lets calculate the 95% probability set of models
   best.models <- list()
   counter <- i <- 0
