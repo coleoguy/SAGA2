@@ -73,7 +73,7 @@ AnalyzeModels <- function(data,
   # We need to preallocate these variables
   # mod.results, num.pars, dev, aic
   mod.results <- vector(mode = "list", length = length(eqns))
-  num.pars <- dev <- aic <- vector(length=legnth(eqns))
+  num.pars <- dev <- aic <- vector(length=length(eqns))
   
   counter <- 1
   for(i in 1:length(eqns)){
