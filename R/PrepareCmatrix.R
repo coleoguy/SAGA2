@@ -66,21 +66,21 @@ PrepareCmatrix <- function(user.data,
   cmatrix$cross <- user.data$cross
   ##### Lets check for pooled parents ######
   #first check to see if there are any
-  pool.count <- 0
-  if(sum(user.data$sire %% 1) > 0 |
-     sum(user.data$dam %% 1) > 0){
-    parents <- c(user.data$sire, user.data$dam)
-    pool.types <- unique(parents[parents %% 1 != 0])
-    pool.count <- length(pool.types)
-  }
-  if(pool.count > 0){
-    # I've added this bit to deal with cases where we have more than one P1 or P2
-    # for instance we may have males and females seperate or we may have common
-    # garden experiments where species are measured in different environments
-    # create the pool name
-    parents <- as.numeric(strsplit(as.character(pool.types), split=".", fixed=T)[[1]])
-    pname <- paste(user.data$cross[parents[1]], user.data$cross[parents[2]], sep=".",collapse="")
-  }
+  # pool.count <- 0
+  # if(sum(user.data$sire %% 1) > 0 |
+  #    sum(user.data$dam %% 1) > 0){
+  #   parents <- c(user.data$sire, user.data$dam)
+  #   pool.types <- unique(parents[parents %% 1 != 0])
+  #   pool.count <- length(pool.types)
+  # }
+  # if(pool.count > 0){
+  #   # I've added this bit to deal with cases where we have more than one P1 or P2
+  #   # for instance we may have males and females seperate or we may have common
+  #   # garden experiments where species are measured in different environments
+  #   # create the pool name
+  #   parents <- as.numeric(strsplit(as.character(pool.types), split=".", fixed=T)[[1]])
+  #   pname <- paste(user.data$cross[parents[1]], user.data$cross[parents[2]], sep=".",collapse="")
+  # }
   #get cross names
   pmatrix$cross <- user.data$cross
   # first we get the P1 and P2 rows
@@ -97,7 +97,6 @@ PrepareCmatrix <- function(user.data,
   to.fill <- which(!complete.cases(pmatrix))
   for(i in to.fill){
     # this chunk is for rows that dont have any pooled parents
-    if(user.data$sire[i] %% 1 == 0 & user.data$dam[i] %% 1 == 0){
       pmatrix$p1a[i]   <- (pmatrix$p1a[user.data$sire[i]] + 
                              pmatrix$p1a[user.data$dam[i]]) / 2.0
       pmatrix$c[i]     <- pmatrix$c[user.data$dam[i]]
@@ -114,67 +113,6 @@ PrepareCmatrix <- function(user.data,
         pmatrix$fp1z[i]  <- pmatrix$mp1z[user.data$sire[i]]
         pmatrix$w[i]     <- pmatrix$w[user.data$dam[i]]
       }
-    }
-    # handles cohort with pooled fathers
-    if(user.data$sire[i] %% 1 != 0){
-      pmatrix$p1a[i]   <- (((pmatrix$p1a[user.data$sire[parents[1]]] +  
-                               pmatrix$p1a[user.data$dam[i]]) / 2.0) +
-                             (pmatrix$p1a[user.data$sire[parents[2]]] + 
-                                pmatrix$p1a[user.data$dam[i]]) / 2.0) / 2
-      pmatrix$c[i]     <- pmatrix$c[user.data$dam[i]]
-      pmatrix$pheno[i] <- user.data$mean[i]
-      if(SCS == "XY" || SCS == "XO" || SCS == "NSC"){
-        pmatrix$fp1x[i]  <- (((pmatrix$mp1x[user.data$sire[parents[1]]] +
-                                 pmatrix$fp1x[user.data$dam[i]]) / 2.0) +
-                               (pmatrix$mp1x[user.data$sire[parents[2]]] +
-                                  pmatrix$fp1x[user.data$dam[i]]) / 2.0) / 2
-        pmatrix$mp1x[i]  <- pmatrix$fp1x[user.data$dam[i]]
-        pmatrix$y[i]     <- (pmatrix$y[user.data$sire[parents[1]]] +
-                               pmatrix$y[user.data$sire[parents[2]]]) / 2
-      }
-      if(SCS == "ZW" || SCS == "ZO"){
-        pmatrix$mp1z[i]  <- (((pmatrix$mp1z[user.data$sire[parents[1]]] +
-                                 pmatrix$fp1z[user.data$dam[i]]) / 2.0) +
-                               (pmatrix$mp1z[user.data$sire[parents[2]]] +
-                                  pmatrix$fp1z[user.data$dam[i]]) / 2.0) / 2
-        pmatrix$fp1z[i]  <- (pmatrix$mp1z[user.data$sire[parents[1]]] +
-                               pmatrix$mp1z[user.data$sire[parents[2]]]) / 2
-        pmatrix$w[i]     <- pmatrix$w[user.data$dam[i]]
-      }
-    }
-    # handles cohort with pooled moms
-    if(user.data$dam[i] %% 1 != 0){
-      pmatrix$p1a[i]   <- (((pmatrix$p1a[user.data$dam[parents[1]]] +  
-                               pmatrix$p1a[user.data$sire[i]]) / 2.0) +
-                             (pmatrix$p1a[user.data$dam[parents[2]]] + 
-                                pmatrix$p1a[user.data$sire[i]]) / 2.0) / 2
-      pmatrix$c[i]     <- (pmatrix$c[user.data$dam[parents[1]]] +
-                             pmatrix$c[user.data$dam[parents[2]]]) / 2
-      
-      pmatrix$pheno[i] <- user.data$mean[i]
-      if(SCS == "XY" || SCS == "XO" || SCS == "NSC"){
-        pmatrix$fp1x[i]  <- (((pmatrix$mp1x[user.data$dam[parents[1]]] +
-                                 pmatrix$fp1x[user.data$sire[i]]) / 2.0) +
-                               (pmatrix$mp1x[user.data$dam[parents[2]]] +
-                                  pmatrix$fp1x[user.data$sire[i]]) / 2.0) / 2
-        
-        pmatrix$mp1x[i]  <- (pmatrix$fp1x[user.data$dam[parents[1]]] +
-                               pmatrix$fp1x[user.data$dam[parents[2]]]) / 2
-        pmatrix$y[i]     <- pmatrix$y[user.data$sire[i]]
-      }
-      if(SCS == "ZW" || SCS == "ZO"){
-        pmatrix$mp1z[i]  <- (((pmatrix$mp1z[user.data$dam[parents[1]]] +
-                                 pmatrix$fp1z[user.data$sire[i]]) / 2.0) +
-                               (pmatrix$mp1z[user.data$dam[parents[2]]] +
-                                  pmatrix$fp1z[user.data$sire[i]]) / 2.0) / 2
-        
-        
-        pmatrix$fp1z[i]  <- pmatrix$mp1z[user.data$sire[i]]
-        
-        pmatrix$w[i]     <- (pmatrix$w[user.data$dam[parent[1]]] + 
-                              pmatrix$w[user.data$dam[parent[2]]]) / 2
-      }
-    }
   }
   ##### pmatrix filled#####
   

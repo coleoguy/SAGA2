@@ -111,17 +111,6 @@ AnalyzeModels <- function(data,
     }
   }
   
-  ######## WE SHOULD BE ABLE TO DELETE THIS BLOCK
-  # # in the unrealistic situation where there was a model that predicted the
-  # # data perfectly we would get -Inf for the AIC should only be an issue in 
-  # # simulated data... for these purposes lets just plug in something that is 
-  # # equal to the lowest AIC value for models in that same parameter range
-  # if(min(aic) == -Inf){
-  #   aic[aic == -Inf] <- sort(unique(aic))[2] -1
-  # }
-  # calculate aicc and delta aicc
-  ######### DELETE THIS BLOCK
-  
   aicc <- aic + (((2 * num.pars) * (num.pars + 1)) / 
                    (nrow(data) - num.pars))
   daicc <- aicc - min(aicc)
