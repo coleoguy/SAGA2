@@ -43,15 +43,23 @@ In previous LCA work maternal effects have always been modeled as the autosomal 
 \strong{Example Data Set}
 
 \tabular{lllllll}{
-    \strong{cohort} \tab \strong{mean} \tab \strong{SE} \tab \strong{sex} \tab \strong{enviro} \tab \strong{sire} \tab \strong{dam}\cr P1 \tab 32 \tab .45 \tab E \tab 32 \tab 1 \tab 1\cr P2 \tab 16 \tab .65 \tab E \tab 32 \tab 2 \tab 2\cr F1 \tab 24 \tab 1.2 \tab E \tab 32 \tab 1 \tab 2\cr rF1 \tab 27 \tab 3.1 \tab E \tab 32 \tab 2 \tab 1\cr BC1a \tab 24 \tab 1.2 \tab E \tab 32 \tab 1 \tab 3\cr P1 \tab 29 \tab .01 \tab E \tab 29 \tab 6 \tab 6\cr P2 \tab 12 \tab .98 \tab E \tab 29 \tab 7 \tab 7\cr F1 \tab 22 \tab .8 \tab E \tab 29 \tab 6 \tab 7\cr rF1 \tab 21 \tab 2.4 \tab E \tab 29 \tab 7 \tab 6\cr rBC1a \tab 20 \tab .56 \tab E \tab 29 \tab 8 \tab 6
+    \strong{cohort} \tab \strong{mean} \tab \strong{SE} \tab \strong{sex} \tab \strong{enviro} \tab \strong{sire} \tab \strong{dam}\cr 
+    P1 \tab 32 \tab .45 \tab E \tab 32 \tab 1 \tab 1\cr 
+    P2 \tab 16 \tab .65 \tab E \tab 32 \tab 2 \tab 2\cr 
+    F1 \tab 24 \tab 1.2 \tab E \tab 32 \tab 1 \tab 2\cr 
+    rF1 \tab 27 \tab 3.1 \tab E \tab 32 \tab 2 \tab 1\cr 
+    BC1a \tab 24 \tab 1.2 \tab E \tab 32 \tab 1 \tab 3\cr 
+    P1 \tab 29 \tab .01 \tab E \tab 29 \tab 6 \tab 6\cr 
+    P2 \tab 12 \tab .98 \tab E \tab 29 \tab 7 \tab 7\cr 
+    F1 \tab 22 \tab .8 \tab E \tab 29 \tab 6 \tab 7\cr 
+    rF1 \tab 21 \tab 2.4 \tab E \tab 29 \tab 7 \tab 6\cr 
+    rBC1a \tab 20 \tab .56 \tab E \tab 29 \tab 8 \tab 6
     }
  \itemize{
      \item Cohorts can be named in any way the user whishes but P1 and P2 are standard names that must be used for the two original strains.  If these are not present in the user data then the software will not be able to construct a C-matrix.
      \item Note that in the case of BC1a the dam is indicated to be a mix of both rF1 and F1 females.  The software will assume this is an equal mixture and is not able to analyze data with unequally pooled lines.
      \item This dataset also indicates that crosses were conducted in two environments (29 and 32). These will be rescaled appropraitely and treated as a potential environmental or gene by environmental effect on the phenotype being studied.
      }
-
-
 }
 \value{
 Returns a "genarch" object which is a list with the following elements:

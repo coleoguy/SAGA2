@@ -21,7 +21,7 @@ LCA <- function(data,
   }
   
   # validate the incoming arguments and data
-  validateData(SCS, user.data = data, Cmatrix)
+  validateData(SCS = SCS, user.data = data, Cmatrix = Cmatrix, messages = messages)
   
   ### if no custom matrix is supplied build a cmatrix based
   ### on the user data and arguments supplied

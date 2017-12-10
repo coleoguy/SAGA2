@@ -1,6 +1,6 @@
 library(SAGA2)
 
-dat1 <- read.csv("inst/ba.sq.26.csv", as.is=T)
+dat1 <- read.csv("ba.sq.26.csv", as.is=T)
 dat2 <- read.csv("inst/ba.sq.29.csv", as.is=T)
 dat3 <- read.csv("inst/ba.sq.35.csv", as.is=T)
 dat4 <- read.csv("inst/ba.sq.comb.csv", as.is=T)

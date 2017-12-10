@@ -16,7 +16,7 @@ ReScale2 <- function(x) {
 ########################################
 
 ######### validate data ################
-validateData <- function(SCS, user.data, Cmatrix){
+validateData <- function(SCS, user.data, Cmatrix, messages){
   # if they are supplying the Cmatrix lets do a couple of basic checks
   if(!is.null(Cmatrix)){
     if(!is.vector(Cmatrix)){
@@ -95,9 +95,11 @@ CleanCmatrix <- function(Cmatrix){
   #drop those composite effects that are equivelant of lower order simpler effects
   if(length(drop.counter)>0){
     badCGEs <- paste(colnames(Cmatrix)[drop.counter], sep=", ", collapse=", ")
-    cat(paste("The following composite effects cannot be estimated with the line \n",
-              "means available because they estimate identical quantities to \n",
-              "lower order effects: \n", badCGEs, "\n\n", sep=""))
+    if(messages==T){
+      cat(paste("The following composite effects cannot be estimated with the line \n",
+                "means available because they estimate identical quantities to \n",
+                "lower order effects: \n", badCGEs, "\n\n", sep=""))
+    }
     Cmatrix <- Cmatrix[,-drop.counter]
   }
   return(list(Cmatrix, crosses))
