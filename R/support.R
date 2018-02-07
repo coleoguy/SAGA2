@@ -77,7 +77,7 @@ validateData <- function(SCS, user.data, Cmatrix, messages){
 ######### End of validation testing ####
 
 ######### Clean the Cmatrix #############
-CleanCmatrix <- function(Cmatrix){
+CleanCmatrix <- function(Cmatrix, messages=F){
   # lets pull out crosses
   crosses <- Cmatrix[, 1]
   Cmatrix <- Cmatrix[, -1]

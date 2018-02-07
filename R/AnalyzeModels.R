@@ -205,7 +205,8 @@ AnalyzeModels <- function(data,
   for(i in 1:(nrow(var.est) - 1)){
     counter <- 0
     mod.vars <- diag(vcov(best.models[[which(names(best.models) == 
-                                             var.est[i, 1])]]))
+                                             var.est[i, 1])]],
+                          complete = FALSE))
     # now lets loop through parameters with j ... the columns
     for(j in 2:(ncol(var.est) - 1)){
       if(var.est[i, j] != 0){

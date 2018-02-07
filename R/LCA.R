@@ -33,7 +33,7 @@ LCA <- function(data,
   }
   
   # remove CGEs in the cmatrix that can't be analyzed
-  cmat.temp <- CleanCmatrix(Cmatrix)
+  cmat.temp <- CleanCmatrix(Cmatrix, messages=messages)
   Cmatrix <- cmat.temp[[1]]
   crosses <- cmat.temp[[2]]
   
