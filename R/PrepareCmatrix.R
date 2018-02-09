@@ -6,7 +6,7 @@ PrepareCmatrix <- function(user.data,
                            messages=T) {
   
   ##### Scale environmental factors #####
-  if(!all(min(user.data$enviro) != -1, max(user.data$enviro) != 1)){
+  if(range(user.data$enviro) != c(-1,1)){
     # if there is only one value we dont need to do anything
     if(length(unique(user.data$enviro)) > 1){
       if(messages == T){
