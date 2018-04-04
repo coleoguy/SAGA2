@@ -1,7 +1,10 @@
-VisModelSpace <- function(data, cex.u = 3, cex.mtext=1, cex.leg=.8){
+VisModelSpace <- function(data, 
+                          cex.u = 3, 
+                          cex.mtext=1, 
+                          cex.leg=.8){
   .pardefault <- par(no.readonly = T)
-  models <- data[[1]]
-  data <- data[[3]]
+  models <- data[[1]] #mod.results
+  data <- data[[5]]   #daicc
   colors <- heat.colors(1101)
   colors <- colors[1001:1]
   waic <- (exp(-.5 * data) / (sum(exp(-.5 * data))))
