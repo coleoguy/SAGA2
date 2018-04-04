@@ -1,5 +1,6 @@
 export(LCA)
 export(VisModelSpace)
+export(EvaluateModel)
 export(plotObserved)
 export(plot.genarch)
 S3method(plot, genarch)
