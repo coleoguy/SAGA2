@@ -24,7 +24,7 @@ plotObserved <- function(data,
   
   # jitter the x values since they are often the same
   if(length(unique(x)) != length(x)){
-     x <- x + rnorm(mean=0, sd=.1, n=length(x))
+     x <- x + rnorm(mean=0, sd=.8, n=length(x))
   }else{
      x <- x
   }
@@ -34,14 +34,14 @@ plotObserved <- function(data,
     high <- max(y + se)
     low <- min(y - se)
     
-    plot(x=x, y=y, 
+    plot(x=x, y=y, col=rgb(.1,.1,.1,.5),
          ylab=ylab, xlab=xlab, 
          xaxt="n", pch=pch, main=main, ylim=c(low,high), xlim=c(0,100))
     for(i in 1:length(x)){
-      lines(x=rep(x[i], 2), y= c((y[i] + se[i]), (y[i] - se[i])))
+      lines(x=rep(x[i], 2), y= c((y[i] + se[i]), (y[i] - se[i])), col=rgb(.1,.1,.1,.5))
     }
   }else{
-    plot(x=x, y=y, ylab=ylab, xlab=xlab, xaxt="n", pch=pch, main=main)
+    plot(x=x, y=y, ylab=ylab, xlab=xlab, col=rgb(.1,.1,.1,.5), xaxt="n", pch=pch, main=main)
   }
   axis(side=1,labels=c(0,50,100), at=c(0,50,100))
   abline(glm(y~x, weights = se), lty="dashed", col="blue")
