@@ -7,7 +7,7 @@ AnalyzeModels <- function(data,
                           model.sum, 
                           max.models, 
                           max.pars,
-                          ret.all, 
+                          ret.all = T, 
                           messages){
 
   ##### generate all possible models storing each matrix in a list

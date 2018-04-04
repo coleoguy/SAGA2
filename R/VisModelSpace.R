@@ -1,7 +1,8 @@
 VisModelSpace <- function(data, 
                           cex.u = 3, 
                           cex.mtext=1, 
-                          cex.leg=.8){
+                          cex.leg=.8,
+                          cex.mod=.35){
   .pardefault <- par(no.readonly = T)
   models <- data[[1]] #mod.results
   data <- data[[5]]   #daicc
@@ -20,6 +21,7 @@ VisModelSpace <- function(data,
   plot(x=xvals, y=yvals, col=colors[mod.heat], pch=15,
        xaxt="n", yaxt="n", cex = cex.u, 
        )
+  text(x=xvals, y=yvals, labels=1:length(xvals), cex=cex.mod)
   x="Increasing Model Complexity"
   y=""
   foobar <- substitute(x %->% y)
