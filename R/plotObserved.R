@@ -1,4 +1,11 @@
-plotObserved <- function(data, SE=T, pch=NULL, col=NULL, xlab=NULL, ylab=NULL, main=NULL){
+plotObserved <- function(data, 
+                         SE=T, 
+                         pch=NULL, 
+                         col=NULL, 
+                         xlab=NULL, 
+                         ylab=NULL, 
+                         main=NULL,
+                         env=FALSE){
   .pardefault <- par(no.readonly = T)
   
   # fill in some defaults
