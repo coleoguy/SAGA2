@@ -3,7 +3,8 @@ PrepareCmatrix <- function(user.data,
                            parental, 
                            drop.pars, 
                            env, 
-                           messages=T) {
+                           messages=T,
+                           Mepi = F) {
   
   ##### Scale environmental factors #####
   if(any(range(user.data$enviro) != c(-1,1))){
@@ -249,7 +250,11 @@ PrepareCmatrix <- function(user.data,
   
   ##### expand the cmatrix to include epistatic #####
   v <- 3:ncol(cmatrix)
-  v <- which(!colnames(cmatrix)[3:ncol(cmatrix)] %in% c("Mea", "Med", "Meo", "Peo")) + 2
+  if(Mepi == T){
+    v <- which(!colnames(cmatrix)[3:ncol(cmatrix)] %in% c("Meo", "Peo")) + 2
+  }else{
+    v <- which(!colnames(cmatrix)[3:ncol(cmatrix)] %in% c("Mea", "Med", "Meo", "Peo")) + 2
+  }
   n <- length(v)
   new.cols <- combinations(n = n, r = 2, v = v, repeats.allowed = T)
   for(i in 1:nrow(new.cols)){
@@ -261,6 +266,9 @@ PrepareCmatrix <- function(user.data,
   }
   # drop EnvEnv that makes no sense
   cmatrix <- cmatrix[, names(cmatrix) != "EnvEnv"]
+  cmatrix <- cmatrix[, names(cmatrix) != "MeaMea"]
+  cmatrix <- cmatrix[, names(cmatrix) != "MedMed"]
+  cmatrix <- cmatrix[, names(cmatrix) != "MeaMed"]
   ##### end of cmatrix expansion #####
   
   ##### return the gold to the user #####

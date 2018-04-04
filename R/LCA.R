@@ -8,7 +8,8 @@ LCA <- function(data,
                 max.pars = NULL,
                 Cmatrix = NULL,
                 ret.all = FALSE,
-                messages = TRUE){
+                messages = TRUE,
+                Mepi = F){
   
   ### lets deal with cross names being treated as factors
   if(is.factor(data$cross)){
@@ -29,7 +30,8 @@ LCA <- function(data,
     Cmatrix <- PrepareCmatrix(user.data = data,
                               SCS = SCS, env = env,
                               drop.pars = drop.pars,
-                              parental = parental)
+                              parental = parental,
+                              Mepi = Mepi)
   }
   
   # remove CGEs in the cmatrix that can't be analyzed
