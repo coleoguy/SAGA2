@@ -24,7 +24,7 @@ plotObserved <- function(data,
   
   # jitter the x values since they are often the same
   if(length(unique(x)) != length(x)){
-     x <- jitter(x)
+     x <- x + rnorm(mean=0, sd=.1, n=length(x))
   }else{
      x <- x
   }
