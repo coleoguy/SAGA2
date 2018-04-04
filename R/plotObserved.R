@@ -10,7 +10,7 @@ plotObserved <- function(data, SE=T, pch=NULL, col=NULL, xlab=NULL, ylab=NULL, m
   # get the x and y
   x <- PrepareCmatrix(user.data = data, SCS = "XY", 
                       parental = "calc", drop.pars = NULL, 
-                      getP=T, messages=F)$p1a * 100
+                      messages=F)$p1a * 100
   y <- data$mean
   se <- data$SE
   
