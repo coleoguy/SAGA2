@@ -188,15 +188,15 @@ PrepareCmatrix <- function(user.data,
                  "Xa" = cmatrix[i, j] <- pxfc(pmatrix, user.data, i),
                  "Xd" = cmatrix[i, j] <- hxfc(pmatrix, user.data, i),
                  "Za" = cmatrix[i, j] <- pzfc(pmatrix, user.data, i),
-                 "Zd" = cmatrix[i, j] <- 0
-                 "Ya" = cmatrix[i, j] <- 0
+                 "Zd" = cmatrix[i, j] <- 0,
+                 "Ya" = cmatrix[i, j] <- 0,
                  "Wa" = cmatrix[i, j] <- pmatrix$w[user.data$dam[i]]
           )
         }
         if (user.data$sex[i] == "M") {
           switch(colnames(cmatrix)[j],
                  "Xa" = cmatrix[i, j] <- pxmc(pmatrix, user.data, i),
-                 "Xd" = cmatrix[i, j] <- 0
+                 "Xd" = cmatrix[i, j] <- 0,
                  "Za" = cmatrix[i, j] <- pzmc(pmatrix, user.data, i),
                  "Zd" = cmatrix[i, j] <- hzmc(pmatrix, user.data, i),
                  "Ya" = cmatrix[i, j] <- pmatrix$y[i]
