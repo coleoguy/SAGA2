@@ -199,7 +199,7 @@ PrepareCmatrix <- function(user.data,
                  "Xd" = cmatrix[i, j] <- 0,
                  "Za" = cmatrix[i, j] <- pzmc(pmatrix, user.data, i),
                  "Zd" = cmatrix[i, j] <- hzmc(pmatrix, user.data, i),
-                 "Ya" = cmatrix[i, j] <- pmatrix$y[i]
+                 "Ya" = cmatrix[i, j] <- pmatrix$y[i],
                  "Wa" = cmatrix[i, j] <- 0
           )
         }
