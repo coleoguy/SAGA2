@@ -170,8 +170,8 @@ PrepareCmatrix <- function(user.data,
         pmatrix$mp1z[user.data$sire[i]]
     }
     #now we want to loop through all our cols and rows
-    for (i in 1:nrow(cmatrix)) {
-      for (j in 1:ncol(cmatrix)) {
+    for (i in 1:nrow(cmatrix)) { # each line
+      for (j in 1:ncol(cmatrix)) { # CGE
         switch(colnames(cmatrix)[j],
                "M"   = cmatrix[i, j] <- 1,
                "Aa"  = cmatrix[i, j] <- pc(pmatrix, user.data, i),
@@ -188,15 +188,19 @@ PrepareCmatrix <- function(user.data,
                  "Xa" = cmatrix[i, j] <- pxfc(pmatrix, user.data, i),
                  "Xd" = cmatrix[i, j] <- hxfc(pmatrix, user.data, i),
                  "Za" = cmatrix[i, j] <- pzfc(pmatrix, user.data, i),
+                 "Zd" = cmatrix[i, j] <- 0
+                 "Ya" = cmatrix[i, j] <- 0
                  "Wa" = cmatrix[i, j] <- pmatrix$w[user.data$dam[i]]
           )
         }
         if (user.data$sex[i] == "M") {
           switch(colnames(cmatrix)[j],
                  "Xa" = cmatrix[i, j] <- pxmc(pmatrix, user.data, i),
+                 "Xd" = cmatrix[i, j] <- 0
                  "Za" = cmatrix[i, j] <- pzmc(pmatrix, user.data, i),
                  "Zd" = cmatrix[i, j] <- hzmc(pmatrix, user.data, i),
                  "Ya" = cmatrix[i, j] <- pmatrix$y[i]
+                 "Wa" = cmatrix[i, j] <- 0
           )
         }
         if (user.data$sex[i] == "E") {
