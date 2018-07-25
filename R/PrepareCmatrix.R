@@ -254,10 +254,12 @@ PrepareCmatrix <- function(user.data,
     names(cmatrix)[ncol(cmatrix)] <- paste(names(cmatrix)[x], names(cmatrix)[y], sep="")
   }
   # drop EnvEnv that makes no sense
+  # TODO Code not stupid like one line with ! %in%
   cmatrix <- cmatrix[, names(cmatrix) != "EnvEnv"]
   cmatrix <- cmatrix[, names(cmatrix) != "MeaMea"]
   cmatrix <- cmatrix[, names(cmatrix) != "MedMed"]
   cmatrix <- cmatrix[, names(cmatrix) != "MeaMed"]
+  cmatrix <- cmatrix[, names(cmatrix) != "YaYa"]
   ##### end of cmatrix expansion #####
   
   ##### return the gold to the user #####
