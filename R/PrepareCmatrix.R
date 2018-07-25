@@ -65,23 +65,7 @@ PrepareCmatrix <- function(user.data,
       c("Meo", "Peo")
   }
   cmatrix$cross <- user.data$cross
-  ##### Lets check for pooled parents ######
-  #first check to see if there are any
-  # pool.count <- 0
-  # if(sum(user.data$sire %% 1) > 0 |
-  #    sum(user.data$dam %% 1) > 0){
-  #   parents <- c(user.data$sire, user.data$dam)
-  #   pool.types <- unique(parents[parents %% 1 != 0])
-  #   pool.count <- length(pool.types)
-  # }
-  # if(pool.count > 0){
-  #   # I've added this bit to deal with cases where we have more than one P1 or P2
-  #   # for instance we may have males and females seperate or we may have common
-  #   # garden experiments where species are measured in different environments
-  #   # create the pool name
-  #   parents <- as.numeric(strsplit(as.character(pool.types), split=".", fixed=T)[[1]])
-  #   pname <- paste(user.data$cross[parents[1]], user.data$cross[parents[2]], sep=".",collapse="")
-  # }
+
   #get cross names
   pmatrix$cross <- user.data$cross
   # first we get the P1 and P2 rows
@@ -97,11 +81,12 @@ PrepareCmatrix <- function(user.data,
   # get unfilled columns
   to.fill <- which(!complete.cases(pmatrix))
   for(i in to.fill){
-    # this chunk is for rows that dont have any pooled parents
       pmatrix$p1a[i]   <- (pmatrix$p1a[user.data$sire[i]] + 
                              pmatrix$p1a[user.data$dam[i]]) / 2.0
       pmatrix$c[i]     <- pmatrix$c[user.data$dam[i]]
       pmatrix$pheno[i] <- user.data$mean[i]
+      
+      # TODO DOESNT SEEM THAT NSC SHOULD BE HERE CAN WE PULL THIS OUT
       if(SCS == "XY" || SCS == "XO" || SCS == "NSC"){
         pmatrix$fp1x[i]  <- (pmatrix$mp1x[user.data$sire[i]] + 
                                pmatrix$fp1x[user.data$dam[i]]) / 2.0
