@@ -10,7 +10,10 @@
     max.models = 300000, 
     drop.pars = NULL, 
     max.pars = NULL, 
-    Cmatrix = NULL)}
+    Cmatrix = NULL,
+    ret.all = FALSE,
+    messages = TRUE,
+    Mepi = FALSE)}
 \arguments{
   \item{data}{a data frame with the 7 columns:
   \itemize{
@@ -35,6 +38,13 @@
   \item{drop.pars}{Vector of strings with the names of composite genetic effects to ignore.}
   \item{max.pars}{Optional numeric value indicating the maximum number of parameters for equations evaluated.}
   \item{Cmatrix}{Optional matrix describing contribution of genetic effects in the cohorts being analyzed.}
+  \item{ret.all}{logical indicating if results of fitting all models should be returned}
+  \item{messages}{logical indicating if verbose messages should be returned}
+  \item{Mepi}{logical indicating if interactions between maternal effects and standard genetic effects should be allowed - has not been tested.}
+
+  
+  
+  
   }
 \details{Provides model averaged estimates of the contribution of composite genetic effects to the line means in line cross analysis experiments.  Using AICc models are given weights and these are used to construct a confidence model set that allows for parameter estimates and errors to include model selection uncertainty. (see Burnham and Anderson 2002).  The original paper contains a full discussion of the implementation (Blackmon and Demuth 2016).
 

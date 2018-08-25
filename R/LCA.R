@@ -6,10 +6,10 @@ LCA <- function(data,
                 max.models = 300000,
                 drop.pars = NULL,
                 max.pars = NULL,
-                Cmatrix = NULL,
-                ret.all = FALSE,
+                Cmatrix = NULL,    # user supplied cmatrix
+                ret.all = FALSE,   # return solution for all models
                 messages = TRUE,
-                Mepi = F){
+                Mepi = FALSE){     # maternal effect epistatic interactions
   
   ### lets deal with cross names being treated as factors
   if(is.factor(data$cross)){
