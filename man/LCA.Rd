@@ -94,7 +94,7 @@ inference: a practical information-theoretic approach. Springer.
 Blackmon, H. and Demuth, J.P., (2016). An information‐theoretic approach to estimating the composite genetic effects contributing to variation among generation means: Moving beyond the joint‐scaling test for line cross analysis. Evolution, 70(2), pp.420-432.
 }
 \author{
-Heath Blackmon and Jeffery P. Demuth}
+Andrew Armstrong, Nathan Anderson, and Heath Blackmon}
 \examples{
 data(PH)
 results <- LCA(PH)
