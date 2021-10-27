@@ -24,7 +24,7 @@ validateData <- function(SCS, user.data, Cmatrix, messages){
       if(!is.matrix(Cmatrix)) stop("Your supplied c-matrix is not a matrix")
       # does it contain the cohorts we need
       if(!sum(user.data[,1] %in% Cmatrix[,1]) == nrow(user.data)){
-        stop("The cross names in your data don't 
+        stop("The cross names in your data don't
              match those in your user supplied c-matrix")
       }
     }
@@ -54,12 +54,13 @@ validateData <- function(SCS, user.data, Cmatrix, messages){
     stop("Phenotypes must be numeric values")
   }
   # Test that standard errors are numeric values
+  colnames(user.data)[3] <- toupper(colnames(user.data)[3])
   if (!is.numeric(user.data$SE)) {
     stop("Standard Errors must be numeric values")
   }
   # If the user supplies no environmental values fill with 1
   if(all(is.na(user.data$enviro))) user.data$enviro <- 1
-  
+
   # Test that environment is between -1 and 1
   if (!is.numeric(user.data$enviro)){
     stop("Environment values need to be numeric values.  If you have discrete
@@ -72,7 +73,7 @@ validateData <- function(SCS, user.data, Cmatrix, messages){
     }
   }
 }
-  
+
 
 ######### End of validation testing ####
 
@@ -82,7 +83,7 @@ CleanCmatrix <- function(Cmatrix, messages=F){
   crosses <- Cmatrix[, 1]
   Cmatrix <- Cmatrix[, -1]
   # lets remove variables that have no difference in lines
-  Cmatrix <- Cmatrix[, c(1, which(apply(Cmatrix, 2, var) != 0))]      
+  Cmatrix <- Cmatrix[, c(1, which(apply(Cmatrix, 2, var) != 0))]
   #lets look for composite effects that are identical
   drop.counter <- vector()
   for(i in 2:(ncol(Cmatrix)-1)){
