@@ -55,7 +55,7 @@ LCA <- function(data,
   }
   
   ### analyze the data based on the cmatrix
-  result <- AnalyzeModels(data = data,
+  result2 <- AnalyzeModels(data = data,
                           Cmatrix = Cmatrix,
                           crosses = crosses,
                           SCS = SCS,

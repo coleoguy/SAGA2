@@ -8,7 +8,7 @@ AnalyzeModels <- function(data,
                           max.models, 
                           max.pars,
                           ret.all = T, 
-                          messages){
+                          messages, way){
 
   ##### generate all possible models storing each matrix in a list
   # col that could be used
@@ -69,11 +69,14 @@ AnalyzeModels <- function(data,
     # generate the matrix for the current model
     test.mat <- as.matrix(Cmatrix[, c(1, eqns[[i]])])
     
-    
-    
-    
+    SEs <- data$SE
+    weights <- SEs ^ - 2
+    if(max(weights) == Inf){
+      SEs[SEs == 0] <- .000000000001
+      weights <- SEs ^ - 2
+    }
     # fit the model weight is equal to the inverse of the square of the SE
-    temp.mod <- glm(data$mean ~ test.mat, weights = data$SE ^ - 2)
+    temp.mod <- glm(data$mean ~ test.mat, weights = weights)
     # this if statement will bypass a model with a singularity
     # 1 NA will be generated for the line mean any additional are sign of sing.
     if(sum(is.na(temp.mod$coef)) < 2){

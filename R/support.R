@@ -68,7 +68,7 @@ validateData <- function(SCS, user.data, Cmatrix, messages){
   }
   # Test that sire and dam values are less than num of rows
   if(is.null(Cmatrix)){
-    if (user.data$sire > NROW(user.data) || user.data$dam > NROW(user.data)) {
+    if (all(user.data$sire > NROW(user.data)) || all(user.data$dam > NROW(user.data))) {
       stop("Sire and Dam row values are invalid.")
     }
   }
