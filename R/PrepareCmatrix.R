@@ -266,6 +266,7 @@ PrepareCmatrix <- function(user.data,
   
   #### keep only user specified CGEs #####
   if(!is.null(keep.pars)){
+    keep.pars <- c("cross", "M", keep.pars)
     x <- which(colnames(cmatrix) %in% keep.pars)
     cmatrix <- cmatrix[, x]
   }
