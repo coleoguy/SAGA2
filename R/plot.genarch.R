@@ -1,6 +1,12 @@
-plot.genarch <- function(x, min.vi = .5, main = NULL, cex.axis = 1, 
-                         cex.names = 1, cex.main = 1, maxval = NULL, 
-                         minval = NULL, col.ramp = NULL, ...){
+plot.genarch <- function(x, 
+                         min.vi = .5, 
+                         main = NULL, 
+                         cex.axis = 1, 
+                         cex.names = 1, 
+                         cex.main = 1, 
+                         maxval = NULL, 
+                         minval = NULL, 
+                         col.ramp = NULL, ...){
   data <- x
   # if the user is getting rid of too much data lets stop and warn them
   if(min.vi > .5) cat("\nYou may want to reduce the min.vi argument to see other

@@ -8,7 +8,7 @@ Plot a publication quality figure of a genarch object with many built-in customi
 \usage{
 \method{plot}{genarch}(x, min.vi = .5, main=NULL, 
              cex.axis=1, cex.names=1, cex.main=1, 
-             maxval=NULL, minval=NULL, viridis=F, ...)
+             maxval=NULL, minval=NULL, col.ramp, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,13 +20,8 @@ Plot a publication quality figure of a genarch object with many built-in customi
   \item{cex.main}{expansion factor for main title}
   \item{maxval}{custom maximum value for a plot}
   \item{minval}{custom minimum value for a plot}
-  \item{viridis}{logical indicating if the viridis color palette should be used}
+  \item{col.ramp}{a color ramp to be used for variable importance}
   \item{\dots}{further arguments passed to plot}
 }
 \author{
 Heath Blackmon and Jeffery P. Demuth}
-\examples{
-data(PH)
-results <- AnalyzeCrossesMM(PH)
-plot(results)
-}

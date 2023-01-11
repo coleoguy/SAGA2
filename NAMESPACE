@@ -4,11 +4,11 @@ export(EvaluateModel)
 export(plotObserved)
 export(plot.genarch)
 S3method(plot, genarch)
-
 importFrom(plotrix, color.legend)
-importFrom(grDevices, heat.colors)
+importFrom(grDevices, heat.colors, rgb)
 importFrom(graphics, barplot, mtext, par, plot, segments, text, abline, axis, lines)
 importFrom(stats, glm, pchisq, var, vcov)
 importFrom(utils, combn, read.csv)
 importFrom(gtools, combinations)
+importFrom(stats, complete.cases, rnorm)
 

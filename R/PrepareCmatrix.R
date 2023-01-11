@@ -2,6 +2,7 @@ PrepareCmatrix <- function(user.data,
                            SCS, 
                            parental, 
                            drop.pars, 
+                           keep.pars,
                            env, 
                            messages=T,
                            Mepi = F) {
@@ -106,7 +107,7 @@ PrepareCmatrix <- function(user.data,
   
   
   ##### fnx to fill cmatrix #####
-  FillCmat <- function(cmatrix, pmat, user.data) {
+  FillCmat <- function(cmatrix, pmatrix, user.data) {
     # to minimize the number of lines with really
     # long code we will user litte composite
     # effect calculator functions
@@ -209,9 +210,9 @@ PrepareCmatrix <- function(user.data,
   ##### end of fnx to fill cmatrix #####
   
   ##### fill the basic cmatrix #####
-  cmatrix <- FillCmat(cmatrix, pmat, user.data)
+  cmatrix <- FillCmat(cmatrix, pmatrix, user.data)
   ##### fill the basic cmatrix #####
-  
+  ## TODO did the change of pmat to pmatrix ruin anyting on the too FillCmat lines
   ##### add env to drop if there are no diffs #####
   if(length(unique(user.data$enviro)) < 2){
     if(is.null(drop.pars)) drop.pars <- "Env"
@@ -227,6 +228,12 @@ PrepareCmatrix <- function(user.data,
   if(!is.null(drop.pars)){
     x <- which(colnames(cmatrix) %in% drop.pars)
     cmatrix <- cmatrix[, -x]
+  }
+  
+  #### keep only user specified CGEs #####
+  if(!is.null(keep.pars)){
+    x <- which(colnames(cmatrix) %in% keep.pars)
+    cmatrix <- cmatrix[, x]
   }
   
   if(env == FALSE){

@@ -9,7 +9,7 @@ is a function of the AICc weight of that model.  Model numbers are printed
 on top of each square allowing the user to investigate any models of interest
 using the function EvaluateModel}
 \usage{
-VisModelSpace(data, cex.u = 3, cex.mtext = 1, cex.leg = 0.8)
+VisModelSpace(data, cex.u = 3, cex.mtext = 1, cex.leg = 0.8, cex.mod=0.35)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -17,11 +17,7 @@ VisModelSpace(data, cex.u = 3, cex.mtext = 1, cex.leg = 0.8)
   \item{cex.u}{expansion factor for the boxes representing the models}
   \item{cex.mtext}{expansion factor for the x and y axis labels}
   \item{cex.leg}{expansion factor for the legend}
+  \item{cex.mod}{expansion factor for text in plot field}
 }
 \author{
 Heath Blackmon and Jeffery P. Demuth}
-\examples{
-data(PH)
-results <- AnalyzeCrossesMM(PH)
-VisModelSpace(results, cex.u=3)
-}

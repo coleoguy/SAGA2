@@ -3,7 +3,7 @@ title: "SAGA version 2.0.0 Tutorial"
 author: Heath Blackmon and Jeffery P. Demuth
 date: "last updated: `r Sys.Date()`"
 output:
-  pdf_document:
+  html_document:
     fig_caption: yes
     toc: true
 vignette: >
@@ -109,12 +109,12 @@ A stable tested version of SAGA is available from the CRAN repository or the mos
 
 Installing from CRAN
 
-    install.packages("SAGA")
+    install.packages("SAGA2")
 
 Installing from github
 
     library(devtools)
-    install_github("coleoguy/SAGA", build_vignettes = TRUE)
+    install_github("coleoguy/SAGA2", build_vignettes = TRUE)
 
 &nbsp;
 
@@ -131,35 +131,10 @@ The first step in analysis of line cross data is choice of a c-matrix that descr
 
 
 __Table 1.__ The first 15 rows and 13 columns of the c-matrix supplied for species with XY sex determination.
-```{r, echo=FALSE, results='asis'}
-foo <- read.csv(system.file("cmatrix.xy.csv", package ="SAGA"))[1:15,1:13]
-knitr::kable(foo, row.names=T, output=T)
-```
 
 &nbsp;
 
-### Editing the c-matrix
-Some studies might need a different c-matrix than what is supplied with SAGA.  One easy way to handle this is to use one of the supplied c-matrices and edit it.  First we will load the XY c-matrix:
-```{r}
-NEW.cmat <- SAGA::DisplayCmatrix(table = "XY")
-```
 
-Now lets print the CGEs so we can determine which ones we need:
-```{r}
-colnames(NEW.cmat)
-```
-
-We will reduce the c-matrix to only CGEs that do not have sex chromosomes in them:
-```{r}
-NEW.cmat <- NEW.cmat[, c(1:3,6:12,20:21)]
-```
-
-Now we have a c-matrix appropriate for an ESD species that can be used as normal:
-```{}
-AnalyzeCrossesMM(data, Cmatrix=NEW.cmat)
-```
-
-&nbsp;
 
 ## Prepare LCA data for input
 
@@ -178,26 +153,6 @@ SAGA comes with several empirical datasets already appropriately formatted.  To 
     data(per.inf, package="SAGA")
 
 __Table 2.__ per.inf data illustrating the format required for analysis with SAGA.
-```{r, echo=FALSE, results='asis'}
-data(per.inf, package="SAGA")
-colnames(per.inf) <- c("Cohort ID", "Mean", "SE") 
-knitr::kable(per.inf, row.names=F, output=T)
-```
-
-\newpage
-
-To look up the cohorts ID numbers use the function `cohortID`.  This will return a data frame with the ID number for each type of cohort.  Parents are listed in parentheses and are in the order sire x dam.  Remember that these numbers only apply to the supplied c-matrices.  If you alter it or supply your own then your cohort ID numbers should match the appropriate rows of your own c-matrix.
-
-`cohortID()`
-
-__Table 3.__ cohort ID lookup table.
-```{r, echo=FALSE}
-cohorts <- SAGA::cohortID()
-prows <- nrow(cohorts)/2
-cohorts <- cbind(cohorts[1:prows,],rep(" ",prows),rep(" ",prows),cohorts[(prows+1):(prows*2),])
-colnames(cohorts) <- c("ID","cohorts","","","ID","cohorts")
-knitr::kable(cohorts, output=T)
-```
 
 \newpage
 
@@ -259,29 +214,7 @@ Using the default settings SAGA will evaluate every possible model that has fewe
 &nbsp;
 \newpage
 
-## Multi-model inference example 1
-
-In this example we analyze the number of offspring that result from a cross of _Tribolium castaneum_ from Peru and Portugal.  This analysis indicates that none of the models tested has a $w_i$ greater than 95%. Figure 1 displays the model averaged parameter estimation from equation 4, and unconditional standard errors calculated in equation 5 are indicated with whiskers on each bar.  The colors of the bars reflects the $v_i$ calculated in equation 6.:
-
-```{r,fig.cap='Model averaged estimate of genetic architecture.', echo=TRUE, warning=FALSE,results='markup', fig.width=6.5}
-# we will need the plotrix package for plotting
-library(plotrix)
-results <- SAGA::AnalyzeCrossesMM(per.inf, graph=T, cex.names=.8)
-```
-
 \newpage
-
-## Multi-model inference example 2
-
-Now we can load a different dataset to demonstrate what happens when there is less model selection uncertainty.  This dataset is from a study of sperm receptacle length measured in crosses between disjunct populations of _Drosophila mojavensis_ from Arizona [6].
-
-```{r, fig.cap='Unconditional estimate of genetic architecture.', echo=TRUE, warning=FALSE, results='markup', fig.width=7}
-library(plotrix)
-#Sperm receptacle length in Drosophila mojavensis
-data(SR, package="SAGA")
-#Because we are using cohorts where we know the distribution of sexes we set sexed=T.
-results2 <- SAGA::AnalyzeCrossesMM(SR, even.sex=T, graph=T, cex.names=.7)
-```
 
 \newpage
 
@@ -312,101 +245,31 @@ Figure two illustrates that though no single model has a $w_i$ sufficient to ign
 
 ## Custom plots
 
-To plot something differently than the default plot returned from the analysis; access the results stored in the genarch object.  First we can simply look at what is returned from `AnalyzeCrossesMM` by looking at the names of the elements in this list.
-
-```{r}
-names(results)
-```
-
-
-
-This shows us that we can access the parameter estimates in element two.  
-```{r, eval=F}
-results[[2]]
-```
-```{r, echo=F}
-results[[2]][1:nrow(results[[2]]),1:ncol(results[[2]])] <- round(as.numeric(results[[2]]), 3)
-results[[2]]
-```
-
-We can also access the variable importances in the fourth element of the genarch object
-```{r}
-results[[4]]
-```
-
 
 &nbsp;
 
 Lets look at how we might plot these using base R functions:
-
-```{r,fig.cap='Subset of model averaged estimate of genetic architecture.', echo=TRUE, warning=FALSE, results='hide', fig.width=5, fig.height=3}
-    # here we extract the 4 largest composite effects found in the first analysis
-    estimates <- as.numeric(results[[2]][1, c(3, 7, 8, 9)])
-    names(estimates) <- colnames(results[[2]])[c(3, 7, 8, 9)]
-    barplot(estimates, main = "Estimate for composite effects",
-            names.arg = names(estimates))
-```
 
 
 &nbsp;
 
 To alleviate the need to manually build a plot from scratch like figure 3 we have provided an S3 plot method for `genarch` objects. It has many useful built-in options such as restricting the plot to only include those CGEs that have a $v_i$ score over a cutoff that you set.  It also allows you to adjust the axis labels and color palette.  For instance, figures 4-6 show alternative plots of the same results shown in figure 1.
 
-&nbsp;
-
-
-`plot(results)`
-
-```{r,fig.cap='The standard full plot returned from the analysis', fig.width = 6, fig.height = 2.5, echo=F}
-# first the standard full plot returned from the analysis
-SAGA::plot.genarch(results, min.vi=0)
-```
-
-&nbsp;
-
-
-`plot(results, min.vi=.25)`
-
-```{r,fig.cap='Now we have reduced the plot to include just those CGEs with a *vi* of at least .25', fig.width = 6, fig.height = 2.5, echo=F}
-SAGA::plot.genarch(results, min.vi=.25)
-```
-
-\newpage
-
-`plot(results, maxval = 85, min.vi = .253, main = "A nicer plot", viridis = T)`
-
-```{r, fig.cap='Now have switched to the viridis color pallete to make it color blind friendly, adjusted the Y axis, and changed the main title.', fig.width = 5.5, fig.height = 2.5, echo=F}
-SAGA::plot.genarch(results, maxval=85, min.vi=.253, main="A nicer plot", viridis=T)
-```
-
-&nbsp;
-
-\newpage
 
 ## Plots of individual models
 
 Finally, although few datasets support inference from any one model SAGA does provide the ability to investigate the results of individual models.  For instance by accessing the $\Delta AICc$ scores saved in the third element of the genarch object we could find the best two models and then plot these using the function `EvaluateModel`.  To illustrate this lets find the best two models from the _Tribolium_ dataset in example 1 and plot them just to see how they differ.
 
-```{r}
-# first lets find the best two models
-order(results[[3]])[1:2]
-```
 
 &nbsp;
 
 We plot the inference conditional on the best fit model below:
 
-```{r, warning=FALSE, results='hide', fig.width = 3.5, fig.height = 2.5, fig.cap='Estimates conditional on model 166'}
-SAGA::EvaluateModel(results, 166, cex.names=.7, cex.main=.7)
-```
 
 &nbsp;
 
 Next the evaluation of the second best model:
 
-```{r, warning=FALSE, results='hide', fig.width = 3.5, fig.height = 2.5, fig.cap='Estimates conditional on model 110'}
-SAGA::EvaluateModel(results, 110, cex.names=.7, cex.main=.7)
-```
 
 Here we can see that the top two models both include 3 composite genetic effects, and in both cases the strongest effect is assigned to autosomal additive by autosomal dominance epistasis.  We can also see that the first model includes autosomal dominance by dominance epistasis while in the second this is replaced by simple autosomal dominance.
 
@@ -417,9 +280,6 @@ Here we can see that the top two models both include 3 composite genetic effects
 
 In LCA papers it is customary to plot the observed phenotype measure of each cohort as a function of percent genome of one parental line.  These graphs are then overlayed with the expectation based on a purely additive model. SAGA includes the plotting function `plotObserved` to produce these graphs. These plots have an X axis representing the amount of parent 1 genome and a Y axis representing the phenotype measure.  They also include the expectation for the phenotype assuming a purely additive model.  Currently this function has only been tested with the supplied c-matrices.
 
-```{r, fig.cap='Observed line means.', fig.width = 4, fig.height = 4, echo=F}
-    SAGA::plotObserved(SR, results)
-```
 
 
 
@@ -429,14 +289,6 @@ In LCA papers it is customary to plot the observed phenotype measure of each coh
 
 The relative fit of models to the data can be explored using the function 'VisModelSpace'.  This function will plot a box for each model tested and will color it based on its $w_i$.  The models are organized from the simplest model (autosomal additive) in the bottom left hand corner and increase in complexity from left to right (first all one parameter models then all two parameter models etc.) once the right hand side of the plot is reached a second row is added above the first.  Only models evaluated and stored in the genarch object are plotted - for instance a model removed due to a colinearity will not be represented in the plot.  To illustrate the differences in model space we can plot the results of the two analyses stored in `results` and `results2`.  First lets look at the _Tribolium_ analysis which indicated a nontrivial level of model selection uncertainty.  The results from this analysis are stored in `results`
 
-```{}
-VisModelSpace(results, cex.u=1.6)
-```
-
-
-```{r, fig.cap='Distribution of akaike weights across model space for _Tribolium_ dataset.', echo=FALSE, warning=FALSE, results='hide', fig.width=4.5, fig.height=4}
-SAGA::VisModelSpace(results, cex.u=1.6)
-```
 
 This plot shows us that there are a number of models of varying complexity that have very similar akaike weights, and this dataset highlights why our understanding of the genetic architecture should not be based on any single model.
 
@@ -444,14 +296,6 @@ This plot shows us that there are a number of models of varying complexity that 
 
 Next lets create the same plot but this time for the _Drosophila_ sperm receptacle length dataset which indicated very little model selection uncertainty.  The results from our analysis of this dataset are stored in `results2`.
 
-```{}
-VisModelSpace(results2, cex.u=.4)
-```
-
-
-```{r, fig.cap='Distribution of akaike weights across model space for _Drosophila_ sperm receptacle length.', echo=FALSE, warning=FALSE, results='hide', fig.width=4.5, fig.height=4}
-SAGA::VisModelSpace(results2, cex.u=.4)
-```
 
 
 &nbsp;
@@ -478,7 +322,7 @@ In reporting the results of line cross analysis experiments, we recommend report
 
 [4] Burnham, K. P., and D. R. Anderson, 2002 Model selection and multimodel inference: a practical information-theoretic approach. Springer, New York.
 
-[5] Demuth, J. P., 2004 Evolution of Hybrid Incompatibility in the beetle Tribolium Castaneum, pp. 152 in Biology. Indiana University, Bloomington.
+[5] Demuth, J. P., 2004 Evolution of Hybrid Incompatibility in the beetle Tribolium castaneum, pp. 152 in Biology. Indiana University, Bloomington.
 
 [6] Miller, G. T., Starmer, W. T., & S. Pitnick 2003. Quantitative genetic analysis of among-population variation in sperm and female sperm-storage organ length in Drosophila mojavensis. Genetical research, 81(03), 213-220.
 

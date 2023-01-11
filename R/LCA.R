@@ -5,6 +5,7 @@ LCA <- function(data,
                 model.sum = .95,
                 max.models = 300000,
                 drop.pars = NULL,
+                keep.pars = NULL,
                 max.pars = NULL,
                 Cmatrix = NULL,    # user supplied cmatrix
                 ret.all = FALSE,   # return solution for all models
@@ -30,6 +31,7 @@ LCA <- function(data,
     Cmatrix <- PrepareCmatrix(user.data = data,
                               SCS = SCS, env = env,
                               drop.pars = drop.pars,
+                              keep.pars = keep.pars,
                               parental = parental,
                               Mepi = Mepi)
   }

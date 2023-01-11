@@ -1,35 +1,17 @@
 \name{data}
 \alias{data}
-\alias{ban.osa}
-\alias{per.inf}
-\alias{dar.bho}
-\alias{sin.cro}
-\alias{SC}
-\alias{SL}
-\alias{SR}
+\alias{BanInf}
+\alias{dat}
 
 \docType{data}
 \title{empirical datasets}
 \description{
 
-ban.osa: Productivity of crosses involving Tribolium castaneum from Ecuador and Japan [1]
-
-dar.bho: Productivity of crosses involving Tribolium castaneum from Tanzania and India [1]
-
-per.inf: Productivity of crosses involving Tribolium castaneum from Peru and Portugal [1]
-
-sin.cro: Productivity of crosses involving Tribolium castaneum from Malaysia and Croatia [1]
-
-sc.humans: skin color data for humans [2]
-
+BanInf: Productivity of crosses involving Tribolium castaneum[1]
 
 }
-\usage{data(ban.osa)}
-\value{A data frame with rows for each cohort and 3 columns:
-  \item{id}{ a numeric vector }
-  \item{mean}{ a numeric vector }
-  \item{SE}{ a numeric vector }
-  }
+\usage{data(BanInf)}
+
 \source{
 [1] Demuth, J.P., Evolution of Hybrid Incompatibility in the beetle Tribolium Castaneum, in Biology. 2004, Indiana University: Bloomington. p. 152.
 

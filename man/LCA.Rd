@@ -9,6 +9,7 @@
     model.sum = .95,
     max.models = 300000, 
     drop.pars = NULL, 
+    keep.pars = NULL,
     max.pars = NULL, 
     Cmatrix = NULL,
     ret.all = FALSE,
@@ -36,16 +37,14 @@
   \item{model.sum}{This is the sum of the probability of the models to be included}
   \item{max.models}{The maximum number of fitted models to return from the function.  This is included as an option to allow analysis of large model space on computers with limited RAM.}
   \item{drop.pars}{Vector of strings with the names of composite genetic effects to ignore.}
+  \item{keep.pars}{Vector of strings with the names of composite genetic effects to test.}
   \item{max.pars}{Optional numeric value indicating the maximum number of parameters for equations evaluated.}
   \item{Cmatrix}{Optional matrix describing contribution of genetic effects in the cohorts being analyzed.}
   \item{ret.all}{logical indicating if results of fitting all models should be returned}
   \item{messages}{logical indicating if verbose messages should be returned}
   \item{Mepi}{logical indicating if interactions between maternal effects and standard genetic effects should be allowed - has not been tested.}
-
-  
-  
-  
   }
+  
 \details{Provides model averaged estimates of the contribution of composite genetic effects to the line means in line cross analysis experiments.  Using AICc models are given weights and these are used to construct a confidence model set that allows for parameter estimates and errors to include model selection uncertainty. (see Burnham and Anderson 2002).  The original paper contains a full discussion of the implementation (Blackmon and Demuth 2016).
 
 In previous LCA work maternal effects have always been modeled as the autosomal additive or dominance status of the dam.  To the degree that the phenotype of interest is not controlled by either autosomal additive or dominance effects this approach will fail to capture the true nature of maternal effects.  As an alternative we offer the \code{parental} argument.  If supplied with the value \code{"obs"}  The phenotypes of all cohorts will be rescaled on an interval of -1 to 1. These values will then function as the expected contribution of either maternal or paternal effects in offspring from a cohort. 
@@ -91,11 +90,7 @@ tested.}
 Burnham, K. P., & Anderson, D. R. (2002). Model selection and multimodel 
 inference: a practical information-theoretic approach. Springer.
 
-Blackmon, H. and Demuth, J.P., (2016). An information‐theoretic approach to estimating the composite genetic effects contributing to variation among generation means: Moving beyond the joint‐scaling test for line cross analysis. Evolution, 70(2), pp.420-432.
+Blackmon, H. and Demuth, J.P., (2016). An information-theoretic approach to estimating the composite genetic effects contributing to variation among generation means: Moving beyond the joint-scaling test for line cross analysis. Evolution, 70(2), pp.420-432.
 }
 \author{
 Andrew Armstrong, Nathan Anderson, and Heath Blackmon}
-\examples{
-data(PH)
-results <- LCA(PH)
-}
