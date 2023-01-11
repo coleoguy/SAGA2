@@ -230,12 +230,6 @@ PrepareCmatrix <- function(user.data,
     cmatrix <- cmatrix[, -x]
   }
   
-  #### keep only user specified CGEs #####
-  if(!is.null(keep.pars)){
-    x <- which(colnames(cmatrix) %in% keep.pars)
-    cmatrix <- cmatrix[, x]
-  }
-  
   if(env == FALSE){
     cmatrix <- cmatrix[, names(cmatrix) != "Env"]
   }  
@@ -268,6 +262,16 @@ PrepareCmatrix <- function(user.data,
   cmatrix <- cmatrix[, names(cmatrix) != "MeaMed"]
   cmatrix <- cmatrix[, names(cmatrix) != "YaYa"]
   ##### end of cmatrix expansion #####
+  
+  
+  #### keep only user specified CGEs #####
+  if(!is.null(keep.pars)){
+    x <- which(colnames(cmatrix) %in% keep.pars)
+    cmatrix <- cmatrix[, x]
+  }
+  
+  
+  
   
   ##### return the gold to the user #####
     return(cmatrix)
