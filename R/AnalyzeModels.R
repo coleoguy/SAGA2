@@ -8,7 +8,7 @@ AnalyzeModels <- function(data,
                           max.models, 
                           max.pars,
                           ret.all = T, 
-                          messages, way){
+                          messages){
 
   ##### generate all possible models storing each matrix in a list
   # col that could be used

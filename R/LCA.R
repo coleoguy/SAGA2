@@ -46,7 +46,7 @@ LCA <- function(data,
   if(messages == T) cat(paste("The composite genetic effects that will be tested are: \n",
                               have.data, "\n", collapse = ", "))
   
-  ### calcualte the potential size of model space
+  ### calculate the potential size of model space
   mod.space.size <- sum(choose(ncol(Cmatrix) -1 , 1:(nrow(Cmatrix) - 2)))
   if(!is.null(max.pars)) mod.space.size <- sum(choose((ncol(Cmatrix) -1), 1:max.pars))
   if(messages == T){
