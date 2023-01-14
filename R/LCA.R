@@ -24,7 +24,7 @@ LCA <- function(data,
   
   # validate the incoming arguments and data
   validateData(SCS = SCS, user.data = data, Cmatrix = Cmatrix, messages = messages)
-  
+  data$cross <- toupper(data$cross)
   ### if no custom matrix is supplied build a cmatrix based
   ### on the user data and arguments supplied
   if(is.null(Cmatrix)){
