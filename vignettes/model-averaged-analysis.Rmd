@@ -1,331 +1,218 @@
 ---
-title: "SAGA version 2.0.0 Tutorial"
-author: Heath Blackmon and Jeffery P. Demuth
-date: "last updated: `r Sys.Date()`"
-output:
-  html_document:
-    fig_caption: yes
-    toc: true
+title: "SAGA2: Model-Averaged Line Cross Analysis"
+author: "Heath Blackmon and Jeffery P. Demuth"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{SAGA tutorial}
+  %\VignetteIndexEntry{SAGA2: Model-Averaged Line Cross Analysis}
   %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 4
+)
+```
 
 # Introduction
 
-Line cross analysis (LCA), or partitioning the contribution of composite genetic effects (CGEs), to the mean phenotype of cohorts is widely used to investigate the genetic architecture of traits.  This approach uses two parental strains which have diverged in a phenotype of interest.   These parents are crossed, producing an F1, and subsequent crosses (e.g. F2, backcross, reciprocals) are made to generate groups that have different combinations of parental genes.  We refer to each of these groups as cohorts.  Using a weighted least squares regression with weights inversely proportional to the variance of the cohort means, the degree to which a phenotype is determined by different CGEs (e.g. additive, dominance, and epistatic gene action) may be estimated [1, 2]. Traditionally LCA has been accomplished using the joint-scaling test, essentially forward variable selection weighted least squares regression.  However this approach has a number of documented problems [3]. A full information-theoretic (I-T) approach to model selection and parameter estimation alleviates difficulties associated with previous approaches and provides additional understanding that is not possible under older approaches such as the joint-scaling test  [4].  SAGA provides a full I-T approach to LCA that leverages the finite sample size corrected version of the Akaike information criterion ($AICc$) to explore all possible models and make unbiased and, when appropriate, model averaged estimates of the contribution of CGEs to cohort means.  SAGA includes eight functions and seven empirical datasets.
+Line cross analysis (LCA) partitions the contribution of composite genetic
+effects (CGEs) to the mean phenotype of cohorts derived from crosses between
+divergent parental strains. Traditional LCA uses the joint-scaling test, which
+has well-documented problems including reliance on stepwise model selection.
 
-Functions:
+SAGA2 implements a full information-theoretic (I-T) approach to LCA that uses
+the corrected Akaike information criterion ($AICc$) to explore all possible
+models and produce model-averaged parameter estimates with unconditional
+standard errors. A key improvement in SAGA2 over the original SAGA is that
+users simply supply their breeding design and the software automatically
+constructs the appropriate C-matrix.
 
-- __AnalyzeCrossesMM__: Primary function that generates and tests all models of genetic architecture possible for a given set of cohorts.
-- __EvaluateModel__: Returns parameter estimates conditional on a single model.
-- __VisModelSpace__: Plots the distribution of Akaike weights across model space.
-- __DisplayCmatrix__: Loads the selected c-matrix as dataframe.
-- __plotObserved__: provides a traditional plot of observed line cross analysis data as well as the expectation under an additive model.
-- __plot.genarch__: An S3 method for plotting genarch objects. Can be used to produce publication quality plots with control over most aspects of the plot including the CGEs included.
-- __cohortID__: Loads a dataframe with cohort IDs and descriptions allowing users to look up cohorts and prepare data for analysis.
-- __AICtoMW__: Converts a vector of $\Delta AIC$ or $\Delta AICc$ values to model weights.
+**Functions:**
 
-Data:
-
-- __ban.osa__: Number of offspring from crosses involving _Tribolium castaneum_ from Ecuador and Japan [5]
-- __dar.bho__: Number of offspring from crosses involving _Tribolium castaneum_ from Tanzania and India [5]
-- __per.inf__: Number of offspring from crosses involving _Tribolium castaneum_ from Peru and Portugal [5]
-- __sin.cro__: Number of offspring from crosses involving _Tribolium castaneum_ from Malaysia and Croatia [5]
-- __PH__: Height data for crosses involving strains of _Nicotiana rustica_ [2].
-- __SL__: Sperm length data for crosses between disjunct populations of _Drosophila mojavensis_ [6].
-- __SR__: Sperm receptacle length data for crosses between disjunct populations of _Drosophila mojavensis_ [6].
-
-
-&nbsp;
-
-# Mathematical Approach
-
-We use the function `GLM` from the base R package to perform weighted least square regression [7].  `GLM` returns the parameter and standard error estimates conditional on the model as well as the $AIC$ value for the model. We convert $AIC$ to $AICc$ using equation 1.  Where $n$ is the number of cohorts and $K$ is the number of parameters being estimated.
-
-&nbsp;
-
-Equation 1: 
-
-$$AICc=AIC + \frac{2K(K+1)}{n-K-1}$$
-
-&nbsp;
-
-We then calculate $AICc$ differences ($\Delta AICc$) using equation 2.
-
-&nbsp;
-
-Equation 2: 
-
-$$\Delta AICc_i = AICc_i - AICc_{min}$$
-
-&nbsp;
-
-Where $\Delta AICc_{min}$ is the minimum $AICc$ score calculated across all possible models and $AICc_i$ is the $AICc$ calculated for a specific model.  $\Delta AICc$ is used in generating Akaike weights ($w_i$) using equation 3.  The denominator in this equation is the summation of the numerator across all possible models being evaluated ($R$).
-
-&nbsp;
-
-Equation 3: 
-
-$$w_i = \frac{e^{-0.5\times \Delta AICc_i}}{\sum_{r=1}^{R}e^{-0.5\times \Delta AICc_r}}$$
-
-&nbsp;
-
-Under the default settings, if $w_i$ of the best model is 0.9 or greater then SAGA will perform parameter estimation under a single model. If no model reaches this threshold then we construct a 95% confidence set of models that contains the minimum number of models whose $w_i$ sum to 0.95. To calculate model averaged parameter estimates and unconditional standard errors we recalculate $w_i$ for each model performing the summation in the denominator of equation 3 across all models in the confidence set. The model weighted parameter estimates  are then calculated using equation 4 where $w_i$ is the recalculated model weight and $\hat{\theta}_i$ is the parameter estimate from the model; the product of these values is summed across all models $R$ in the confidence set.  This summation includes those models excluding the parameter being estimated.  We choose this version of the equation becuase the inclusion of a model without the CGE is evidence for it having zero contribution and so should reduce the estimate of its magnitude.
-
-&nbsp;
-
-Equation 4: 
-$$\hat{\bar{\theta}} = \sum_{i=1}^{R} w_i \times \hat{\theta}_i$$
-
-&nbsp;
-
-Standard error estimates that are unconditional on any one model are calculated using equation 5. The term $\hat{var}\left(\hat{\theta_{i}}|g_i\right)$ represents the conditional variance of a parameter estimate under an individual model while 
-$\left(\hat{\theta_i}-\hat{\bar{\theta}}\right)^2$ is simply the squared deviation of the parameter estimate under a given model from the model weighted average for that parameter.  
-
-&nbsp;
-
-Equation 5: 
-
-$$
-\hat{se} \left(\hat{\bar{\theta}}\right)=\sum_{i=1}^{R}w_i\sqrt{\hat{var}\left(\hat{\theta_{i}}|g_i\right)+\left(\hat{\theta_i}-\hat{\bar{\theta}}\right)^2}
-$$
-
-&nbsp;
-
-Finally variable importance $v_i$ is calculated by summing $w_i$ of all models in the confidence set R in which a CGE occurs (Eq. 6).  
-
-&nbsp;
-
-Equation 6: 
-
-$$v_i = \sum_{i=1}^{R} w_i$$
-
-&nbsp;
+- `LCA()`: Primary analysis function --- generates and tests all models.
+- `EvaluateModel()`: Examine parameter estimates from a single model.
+- `VisModelSpace()`: Visualize the distribution of Akaike weights across
+  model space.
+- `plotObserved()`: Traditional LCA plot of observed data with additive
+  expectation.
+- `plot.genarch()`: S3 plot method for publication-quality figures of
+  model-averaged results.
 
 # Installation
 
-A stable tested version of SAGA is available from the CRAN repository or the most recent version may be installed from github using the devtools package: 
+Install the development version from GitHub:
 
-Installing from CRAN
+```{r install, eval = FALSE}
+# install.packages("remotes")
+remotes::install_github("coleoguy/SAGA2")
+```
 
-    install.packages("SAGA2")
+# Quick Start
 
-Installing from github
+```{r quickstart}
+library(SAGA2)
 
-    library(devtools)
-    install_github("coleoguy/SAGA2", build_vignettes = TRUE)
+# Load the example dataset
+data(BanInf)
+head(BanInf)
 
-&nbsp;
+# Run the analysis
+result <- LCA(BanInf, SCS = "NSC", messages = FALSE)
 
+# View model-averaged estimates
+result$estimates
+```
 
-# Fitting LCA Models
+# Preparing Data
 
-## Matrix of composite genetic effects
+Data for SAGA2 must be a data frame with 7 columns:
 
-### The supplied c-matrices of composite genetic effects 
-The first step in analysis of line cross data is choice of a c-matrix that describes the expected contribution of different types of gene action to mean cohort phenotypes.  By default SAGA will use a c-matrix that is designed for a species with XY sex determination and scaled to the midparent mean (equivalent to $F_{\infty}$), and includes 23 potential CGEs. For each CGE it includes coefficients for 24 potential crosses; each of which is divided into male, female, or mixed sex cohorts. The c-matrix has 72 rows and the row numbers are used to identify the cohorts being used in an experiment. The function DisplayCmatrix is available so you can decide if the supplied version has all of the CGEs and cohorts necessary.
+| Column   | Description |
+|----------|-------------|
+| `cross`  | Name of each cohort (e.g., "P1", "P2", "F1", "rF1") |
+| `mean`   | Mean phenotype of the cohort |
+| `SE`     | Standard error of the cohort mean |
+| `sex`    | Sex: "M", "F", "E" (equal ratio), or "U" (unknown) |
+| `enviro` | Environmental variable (numeric, or `NA`) |
+| `sire`   | Row number of the sire in the data frame |
+| `dam`    | Row number of the dam in the data frame |
 
-    # print the c-matrix to the terminal
-    DisplayCmatrix(table = "XY")
+Important notes:
 
+- `P1` and `P2` must be present as the two parental strains.
+- For parental lines, `sire` and `dam` should point to the line's own row.
+- Environmental values will be automatically rescaled to [-1, 1] if needed.
 
-__Table 1.__ The first 15 rows and 13 columns of the c-matrix supplied for species with XY sex determination.
+# Detailed Walkthrough
 
-&nbsp;
+## Running the Analysis
 
+The `LCA()` function is the main entry point. It accepts several arguments
+to control the analysis:
 
+```{r analysis}
+# Full analysis with NSC (no sex chromosomes)
+result <- LCA(
+  data = BanInf,
+  SCS = "NSC",          # No sex chromosome system
+  model.sum = 0.95,     # 95% confidence set of models
+  messages = FALSE
+)
+```
 
-## Prepare LCA data for input
+The returned object is of class `"genarch"` and contains:
 
-Data that will be analyzed with SAGA should be in a dataframe with three columns: 
+```{r results}
+# Model-averaged parameter estimates and unconditional SEs
+result$estimates
 
-    1) id of the cohort - to match the appropriate row number of the c-matrix you are using
-    2) mean phenotype measure of the cohort  
-    3) standard error of the cohort's mean phenotype.  
+# Variable importance scores
+result$varimp
 
-Row names are ignored and will not effect the analysis.
+# The C-matrix used in the analysis
+head(result$cmatrix)
+```
 
-\newpage
+## Plotting Model-Averaged Results
 
-SAGA comes with several empirical datasets already appropriately formatted.  To illustrate the format we can load data on the number offspring produced by crosses involving _Tribolium castaneum_ from Peru and Portugal [6].
+The S3 `plot()` method for `"genarch"` objects creates a barplot of
+model-weighted average estimates with unconditional standard error bars.
+Bar color reflects variable importance.
 
-    data(per.inf, package="SAGA")
+```{r plot-results, fig.width=7, fig.height=5}
+plot(result, min.vi = 0.3)
+```
 
-__Table 2.__ per.inf data illustrating the format required for analysis with SAGA.
+The `min.vi` argument controls which CGEs appear in the plot --- only those
+with variable importance at or above the threshold are shown.
 
-\newpage
+## Plotting Observed Data
 
-## Analyze models
+The `plotObserved()` function creates a traditional LCA plot showing cohort
+phenotypes as a function of the percentage of parent 1 genome, with the
+additive expectation overlaid:
 
-Once data is prepared as above you perform the analysis with the function `AnalyzeCrossesMM`. This function has a variety of arguments to allow fine control of the analysis:
+```{r plot-observed, fig.width=6, fig.height=5}
+plotObserved(BanInf)
+```
 
-General Arguments
+## Visualizing Model Space
 
-- **data:**	 a data frame with the first three columns: 
+`VisModelSpace()` displays every evaluated model as a colored square, with
+color indicating Akaike weight. Models are arranged from simplest
+(bottom-left) to most complex (top-right):
 
-    1) id of the cohort this must mach the coefficient row of the c-matrix
-    2) mean phenotype measure of the cohort 
-    3) Standard error of the cohort's mean phenotype
+```{r model-space, fig.width=7, fig.height=5}
+VisModelSpace(result)
+```
 
-- __Cmatrix:__	 A text string used to select the c-matrix to be used in the analysis.  Included options are "XY", "XO", "ZW", "ZO", or "esd".  A user matrix can also be supplied as a dataframe.
+## Evaluating Individual Models
 
-- __model.sum:__	 This is the sum of the probability of the models to be included in the confidence set.
+To examine a specific model in detail, use `EvaluateModel()`. This requires
+the analysis to have been run with `ret.all = TRUE`:
 
-- __even.sex:__	 A logical by default it is false. It should be set as true if either sexed cohorts are included or if mixed sex cohorts are included but have equal numbers of males and females.
+```{r eval-model, fig.width=6, fig.height=5}
+result2 <- LCA(BanInf, SCS = "NSC", ret.all = TRUE, messages = FALSE)
 
-Arguments to help with large datasets
+# Evaluate the first model
+eval1 <- EvaluateModel(result2, model = 1)
+eval1$Estiamtes
+eval1$P.val
+```
 
-- __max.pars:__	 Optional parameter limiting the size of the equations evaluated.  See discussion below on the size of model space.
+# Advanced Usage
 
-- __max.models:__	 By default set to 300,000.  This is the maximum number of fitted models to return from the function. This is included as an option to allow analysis of large model space on computers with limited RAM.  This argument only impacts the number of models stored in the returned genarch object.  Internally all models are still fit and the results are based on all models and not the subset of models returned.
+## Controlling Model Space
 
-Arguments to control plotting
+For datasets with many cohorts, the number of possible models can be very
+large. Use `max.pars` to limit the maximum number of parameters per model:
 
-- __graph:__	 Logical indicating whether a plot of results should be produced.
+```{r max-pars, eval = FALSE}
+result <- LCA(BanInf, SCS = "NSC", max.pars = 4, messages = FALSE)
+```
 
-- __cex.axis:__	 Expansion factor for numeric axis labels.
+## Dropping or Keeping Specific CGEs
 
-- __cex.names:__	 Expansion factor for name labels.
+You can exclude specific composite genetic effects with `drop.pars` or
+restrict the analysis to only certain effects with `keep.pars`:
 
-- __cex.main:__	 Expansion factor for main title.
+```{r drop-keep, eval = FALSE}
+# Drop maternal effects
+result <- LCA(BanInf, SCS = "NSC", drop.pars = c("Mea", "Med"),
+              messages = FALSE)
 
+# Keep only additive and dominance effects
+result <- LCA(BanInf, SCS = "NSC", keep.pars = c("Aa", "Ad"),
+              messages = FALSE)
+```
 
-This will return a list of the class "genarch".  The list has four elements:
+## Observed Parental Effects
 
-- __models:__ a list containing the weighted least squares solution for all models tested.
+By default, maternal effects are calculated from autosomal additive and
+dominance coefficients. Setting `parental = "obs"` instead uses the
+observed phenotypic values of parental lines, rescaled to [-1, 1]:
 
-- __estimates:__ a data frame containing Model Weighted Average for each parameter and its unconditional standard error.
+```{r parental, eval = FALSE}
+result <- LCA(BanInf, SCS = "NSC", parental = "obs", messages = FALSE)
+```
 
-- __daicc:__ a vector of the $\Delta AICc$ scores for all models tested.
+# References
 
-- __varimp:__ a data frame containing the $v_i$ scores for composite effects
+1. Blackmon, H. and Demuth, J.P. (2016). An information-theoretic approach
+   to estimating the composite genetic effects contributing to variation
+   among generation means: Moving beyond the joint-scaling test for line
+   cross analysis. *Evolution*, 70(2), 420--432.
 
-As SAGA is analyzing the data it will print the composite effects being tested as well as progress in analyzing models to the terminal, and if `graph=TRUE` a plot of the primary results of the analysis.  
+2. Burnham, K.P. and Anderson, D.R. (2002). *Model selection and multimodel
+   inference: a practical information-theoretic approach*. Springer.
 
-### Mixed sex cohorts
+3. Lynch, M. and Walsh, B. (1998). *Genetics and analysis of quantitative
+   traits*. Sinauer Associates, Inc.
 
-The argument `even.sex` in `AnalyzeCrossesMM` is important to consider.  This is set as `FALSE` by default.  This builds in the assumption that neither sex specific cohorts nor cohorts with an equal number of males and females measured are included in the data being analyzed.  Lacking either single sex cohorts or cohorts of equal sex ratio will greatly reduce the number of CGEs that can be investigated.  This argument is also only used when the supplied c-matrix is being used.  If you are using a custom c-matrix you will need to insure that you have calculated coefficients that match your cohorts with regard to sex or ratio of sexes.   
-
-### The size of model space
-
-Using the default settings SAGA will evaluate every possible model that has fewer parameters than the number of cohorts included.  In almost all studies we can evaluate every possible model given the cohorts available.  However, in cases where many different types of sexed cohorts (i.e. more than 15) are available and the species have sex chromosomes the number of models can become prohibitive.  One solution to this is to use the `max.pars` argument.  This will limit the size of the equations evaluated.  Mixed model analyses are relatively robust to the exclusion of models with low probability.  Because of this we recommend that you begin with an intermediate value like 6.  This will allow SAGA to analyze every possible equation with 6 or fewer parameters. Next begin increasing the `max.pars` argument, if the inferred architecture is stable as you increase it from 7, 8, 9, 10 and the number of models  included in the confidence set is not increasing then it means that none of these additional models are better than simpler models already analyzed.  In this situation we believe that the answer based on all equations below with less than 10 parameters is likely reliable.  We have found no empirical datasets that place high support on equations with greater than 6 CGEs.
-
-&nbsp;
-\newpage
-
-\newpage
-
-\newpage
-
-Figure two illustrates that though no single model has a $w_i$ sufficient to ignore model selection uncertainty, the evidence ratio ($w_i$ of the best model divided by the next best $w_i$) is over 2 for the best model and two CGEs exhibit $v_i$ scores of much higher than any others.  In this case autosomal additive and cytotype by X chromosome additive epistasis have $v_i$ of .98 and .89 respectively.  Additionaly as figure 2 shows no other CGEs have estimates that exclude zero, and if we look at the 10 best models we find that it is Aa and CaXa that are present in all of them.  The other included CGEs explain very little of the variation and we would interpret only Aa and CaXa as being important in this trait.
-
-&nbsp;
-
-
-**Table 3** The ten best models the CGEs included and model weights.
-
-|model  |CGEs                    |$w_i$   |
-|-----  |-----                   |-----   |
-|25     |**Aa CaXa**             |.23     |
-|154    |**Aa CaXa**   XaAd      |.11     |
-|112    |**Aa CaXa**   Xa        |.09     |
-|142    |**Aa CaXa**   AaAa      |.07     |
-|129    |**Aa CaXa**   Mea       |.03     |
-|102    |**Aa CaXa**   Ad        |.03     |
-|147    |**Aa CaXa**   AaAd      |.02     |
-|570    |**Aa CaXa**   XaAd AaAa |.02     |
-|121    |**Aa CaXa**   Ca        |.02     |
-|156    |**Aa CaXa**   CaAa      |.02     |
-
-
-&nbsp;
-
-# Plotting Results
-
-## Custom plots
-
-
-&nbsp;
-
-Lets look at how we might plot these using base R functions:
-
-
-&nbsp;
-
-To alleviate the need to manually build a plot from scratch like figure 3 we have provided an S3 plot method for `genarch` objects. It has many useful built-in options such as restricting the plot to only include those CGEs that have a $v_i$ score over a cutoff that you set.  It also allows you to adjust the axis labels and color palette.  For instance, figures 4-6 show alternative plots of the same results shown in figure 1.
-
-
-## Plots of individual models
-
-Finally, although few datasets support inference from any one model SAGA does provide the ability to investigate the results of individual models.  For instance by accessing the $\Delta AICc$ scores saved in the third element of the genarch object we could find the best two models and then plot these using the function `EvaluateModel`.  To illustrate this lets find the best two models from the _Tribolium_ dataset in example 1 and plot them just to see how they differ.
-
-
-&nbsp;
-
-We plot the inference conditional on the best fit model below:
-
-
-&nbsp;
-
-Next the evaluation of the second best model:
-
-
-Here we can see that the top two models both include 3 composite genetic effects, and in both cases the strongest effect is assigned to autosomal additive by autosomal dominance epistasis.  We can also see that the first model includes autosomal dominance by dominance epistasis while in the second this is replaced by simple autosomal dominance.
-
-
-\newpage
-
-## Plots of observed data
-
-In LCA papers it is customary to plot the observed phenotype measure of each cohort as a function of percent genome of one parental line.  These graphs are then overlayed with the expectation based on a purely additive model. SAGA includes the plotting function `plotObserved` to produce these graphs. These plots have an X axis representing the amount of parent 1 genome and a Y axis representing the phenotype measure.  They also include the expectation for the phenotype assuming a purely additive model.  Currently this function has only been tested with the supplied c-matrices.
-
-
-
-
-\newpage
-
-# Assesing Model Uncertainty
-
-The relative fit of models to the data can be explored using the function 'VisModelSpace'.  This function will plot a box for each model tested and will color it based on its $w_i$.  The models are organized from the simplest model (autosomal additive) in the bottom left hand corner and increase in complexity from left to right (first all one parameter models then all two parameter models etc.) once the right hand side of the plot is reached a second row is added above the first.  Only models evaluated and stored in the genarch object are plotted - for instance a model removed due to a colinearity will not be represented in the plot.  To illustrate the differences in model space we can plot the results of the two analyses stored in `results` and `results2`.  First lets look at the _Tribolium_ analysis which indicated a nontrivial level of model selection uncertainty.  The results from this analysis are stored in `results`
-
-
-This plot shows us that there are a number of models of varying complexity that have very similar akaike weights, and this dataset highlights why our understanding of the genetic architecture should not be based on any single model.
-
-\newpage
-
-Next lets create the same plot but this time for the _Drosophila_ sperm receptacle length dataset which indicated very little model selection uncertainty.  The results from our analysis of this dataset are stored in `results2`.
-
-
-
-&nbsp;
-
-# Conclusion
-
-Users should consider the presence of linear dependencies in c-matrices.  Depending on your choice of cohorts some CGEs will likely be linearly dependent.  This means that they can not be distinguished from each other and can not be estimated simultaneously.  SAGA deals with this first by dropping any higher order CGEs that are perfectly correlated with a lower order effect from the c-matrix being used.  However some combinations of CGEs may still be highly correlated (colinear) with each other.  SAGA deals with this by dropping any model that includes the CGEs that are highly correlated.  The importance and magnitude of each particular CGE involved in the colinearity is estimated only by the subset of models where it still appears.  In our experience a strong signal of the importance of CGEs remains though the parameter estimates become less accurate and the variable importance scores will be lower.  When variables with high $v_i$ scores do not appear jointly in the equations included in the confidence set, it is a strong indication that there is a colinearity, and warrants additional investigation.  Often the only solution to this problem will be a careful examination of the c-matrix to determine what type of additional cohort(s) could be measured to most effectively demonstrate the difference in the contributions of the CGEs that are confounded.
-
-Despite the improvements provided by implementing an I-T approach in SAGA, we would caution users that in our analysis of simulated datasets we have found that spurious variables are often included in models that are part of the confidence set, (i.e. table3).  These spurious variables are likely included because they are able to explain some stochastic noise in the dataset.  However, these are usually easily identified by small parameter estimates with standard errors overlapping zero.  	
-
-In reporting the results of line cross analysis experiments, we recommend reporting estimates and standard errors from model averaged results unless a single model has greater than 95% $w_i$.  It is also important to report $v_i$ scores since these give an indication of our certainty that a particular composite genetic effect is important in the genetic architecture of the trait in question.  Finally, although one of the benefits of our approach is a move away from strict arbitrarily defined p-values we have found that as a rule of thumb across all simulated datasets that we have analyzed $v_i$ scores of greater than 50% have only been associated with CGEs that were included in the generating model.
-
-
-
-
-&nbsp;
-
-# Citations
-[1] Mather, K., and J. L. Jinks, 1982 Biometrical genetics: The study of continuous variation. Chapman and Hall, London.
-
-[2] Lynch, M., and B. Walsh, 1998 Lynch, M., & Walsh, B. (1998). Genetics and analysis of quantitative traits. Sinauer Associates, Inc., Sunderland, Massachusetts.
-
-[3] Whittingham, M. J., P. A. Stephens, R. B. Bradbury and R. P. Freckleton, 2006 Why do we still use stepwise modelling in ecology and behaviour? J Anim Ecol 75: 1182-1189.
-
-[4] Burnham, K. P., and D. R. Anderson, 2002 Model selection and multimodel inference: a practical information-theoretic approach. Springer, New York.
-
-[5] Demuth, J. P., 2004 Evolution of Hybrid Incompatibility in the beetle Tribolium castaneum, pp. 152 in Biology. Indiana University, Bloomington.
-
-[6] Miller, G. T., Starmer, W. T., & S. Pitnick 2003. Quantitative genetic analysis of among-population variation in sperm and female sperm-storage organ length in Drosophila mojavensis. Genetical research, 81(03), 213-220.
-
-[7] R Development Core Team, 2013 R: A Language and Environment for Statistical Computing, pp., Vienna, Austria.
-
-
+4. Demuth, J.P. (2004). Evolution of Hybrid Incompatibility in the beetle
+   *Tribolium castaneum*. PhD thesis, Indiana University.

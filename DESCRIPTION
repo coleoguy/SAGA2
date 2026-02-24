@@ -2,16 +2,38 @@ Package: SAGA2
 Type: Package
 Title: Software for the Analysis of Genetic Architecture
 Version: 2.0.0
-Date: 2015-12-01
-Author: Heath Blackmon and Jeffery P. Demuth
-Maintainer: Heath Blackmon <coleoguy@gmail.com>
-Description: Implements an information theory approach to the analysis of line
-    cross data providing model averaged results of parameter estimates and
-    unconditional standard errors.  Also includes functions to provide a
-    visualization of models space, custom plots of multi-model inference results, and traditional
-    line cross analysis plots.
+Authors@R: c(
+    person("Heath", "Blackmon", email = "coleoguy@gmail.com",
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-5433-4036")),
+    person("Jeffery P.", "Demuth", role = "aut"),
+    person("Andrew", "Armstrong", role = "ctb"),
+    person("Nathan", "Anderson", role = "ctb"),
+    person("Jonathon", "Leach", role = "ctb"))
+Description: Implements an information-theoretic approach to the analysis of
+    line cross data providing model averaged results of parameter estimates
+    and unconditional standard errors. Uses AICc-based model selection to
+    explore all possible models of composite genetic effects contributing to
+    variation among generation means. Also includes functions to visualize
+    model space, produce custom plots of multi-model inference results, and
+    traditional line cross analysis plots.
 License: GPL (>= 2)
-URL: https://github.com/coleoguy/SAGA
-Imports: plotrix, gtools
-Suggests: knitr
+URL: https://github.com/coleoguy/SAGA2
+BugReports: https://github.com/coleoguy/SAGA2/issues
+Depends: R (>= 3.5.0)
+Imports:
+    plotrix,
+    gtools,
+    grDevices,
+    graphics,
+    stats,
+    utils
+Suggests:
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3

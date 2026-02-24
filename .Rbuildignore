@@ -1,0 +1,14 @@
+^\.github$
+^.*\.Rproj$
+^\.Rproj\.user$
+^README\.Rmd$
+^LICENSE\.md$
+^cran-comments\.md$
+^\.DS_Store$
+^\.Rhistory$
+^\.claude$
+^\.lintr$
+^codecov\.yml$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

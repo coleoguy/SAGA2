@@ -1,0 +1,31 @@
+#' Productivity of Tribolium castaneum Crosses
+#'
+#' Productivity data (number of offspring) from line crosses involving
+#' *Tribolium castaneum* populations from Bangalore, India and Inez, Kentucky.
+#' This dataset is formatted for use with the [LCA()] function and includes
+#' 16 cohorts with mean productivity and standard errors.
+#'
+#' @format A data frame with 16 rows and 7 columns:
+#' \describe{
+#'   \item{cross}{Character. Name of the cohort (e.g., "P1", "P2", "F1",
+#'     "rF1", "F2a", etc.).}
+#'   \item{mean}{Numeric. Mean phenotype (number of offspring) for the cohort.}
+#'   \item{SE}{Numeric. Standard error of the cohort mean.}
+#'   \item{sex}{Character. Sex of cohort: "M" (male), "F" (female),
+#'     "E" (equal ratio), or "U" (unknown/unequal).}
+#'   \item{enviro}{Numeric. Environmental variable measured for each cohort.
+#'     Can be `NA` if not applicable.}
+#'   \item{sire}{Integer. Row number in the data frame representing the sire
+#'     of this cohort.}
+#'   \item{dam}{Integer. Row number in the data frame representing the dam
+#'     of this cohort.}
+#' }
+#'
+#' @source Demuth, J.P. (2004). Evolution of Hybrid Incompatibility in the
+#'   beetle *Tribolium castaneum*. PhD thesis, Indiana University, Bloomington.
+#'
+#' @examples
+#' data(BanInf)
+#' str(BanInf)
+#' head(BanInf)
+"BanInf"

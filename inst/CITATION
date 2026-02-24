@@ -1,0 +1,14 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "An information-theoretic approach to estimating the composite genetic effects contributing to variation among generation means: Moving beyond the joint-scaling test for line cross analysis",
+  author   = c(
+    person("Heath", "Blackmon"),
+    person("Jeffery P.", "Demuth")
+  ),
+  journal  = "Evolution",
+  year     = "2016",
+  volume   = "70",
+  number   = "2",
+  pages    = "420--432",
+  doi      = "10.1111/evo.12867"
+)
