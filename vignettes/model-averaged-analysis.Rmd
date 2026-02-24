@@ -1,6 +1,6 @@
 ---
 title: "SAGA2: Model-Averaged Line Cross Analysis"
-author: "Heath Blackmon and Jeffery P. Demuth"
+author: "Heath Blackmon, Andrew Armstrong, and Jeffery P. Demuth"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
