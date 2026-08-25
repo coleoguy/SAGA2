@@ -161,7 +161,7 @@ result2 <- LCA(BanInf, SCS = "NSC", ret.all = TRUE, messages = FALSE)
 
 # Evaluate the first model
 eval1 <- EvaluateModel(result2, model = 1)
-eval1$Estiamtes
+eval1$Estimates
 eval1$P.val
 ```
 

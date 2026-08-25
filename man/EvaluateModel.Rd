@@ -22,10 +22,13 @@ X-axis. Default is \code{1}.}
 is \code{1}.}
 }
 \value{
-A list with three elements:
+A list with four elements:
 \describe{
-\item{Estiamtes}{A 2-row matrix with parameter estimates (row 1) and
+\item{Estimates}{A 2-row matrix with parameter estimates (row 1) and
 conditional standard errors (row 2) for each CGE in the model.}
+\item{Estiamtes}{Deprecated alias for \code{Estimates}, kept for backwards
+compatibility with older scripts. Will be removed in a future
+release.}
 \item{P.val}{Numeric. P-value from a chi-squared goodness-of-fit test
 of the model's residual deviance.}
 \item{Bonf.Corr.Alpha}{Numeric. Bonferroni-corrected significance level

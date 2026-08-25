@@ -4,14 +4,14 @@ PrepareCmatrix <- function(user.data,
                            drop.pars, 
                            keep.pars,
                            env, 
-                           messages=T,
-                           Mepi = F) {
+                           messages=TRUE,
+                           Mepi = FALSE) {
   
   ##### Scale environmental factors #####
   if(any(range(user.data$enviro) != c(-1,1))){
     # if there is only one value we dont need to do anything
     if(length(unique(user.data$enviro)) > 1){
-      if(messages == T){
+      if(messages == TRUE){
         print("Scaling environmental variable to be on a scale of -1, 1")
       }
       user.data$enviro <- ReScale2(user.data$enviro)
@@ -240,13 +240,13 @@ PrepareCmatrix <- function(user.data,
   
   ##### expand the cmatrix to include epistatic #####
   v <- 3:ncol(cmatrix)
-  if(Mepi == T){
+  if(Mepi == TRUE){
     v <- which(!colnames(cmatrix)[3:ncol(cmatrix)] %in% c("Meo", "Peo")) + 2
   }else{
     v <- which(!colnames(cmatrix)[3:ncol(cmatrix)] %in% c("Mea", "Med", "Meo", "Peo")) + 2
   }
   n <- length(v)
-  new.cols <- combinations(n = n, r = 2, v = v, repeats.allowed = T)
+  new.cols <- combinations(n = n, r = 2, v = v, repeats.allowed = TRUE)
   for(i in 1:nrow(new.cols)){
     x <- new.cols[i, 1]
     y <- new.cols[i, 2]
@@ -276,6 +276,5 @@ PrepareCmatrix <- function(user.data,
   
   ##### return the gold to the user #####
     return(cmatrix)
-    return(pmatrix)
   ##### we should be done #####
 }

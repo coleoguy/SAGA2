@@ -1,7 +1,7 @@
 Package: SAGA2
 Type: Package
 Title: Software for the Analysis of Genetic Architecture
-Version: 2.0.0
+Version: 2.0.1
 Authors@R: c(
     person("Heath", "Blackmon", email = "coleoguy@gmail.com",
            role = c("aut", "cre"),
@@ -36,4 +36,4 @@ VignetteBuilder: knitr
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
+Config/roxygen2/version: 8.1.0

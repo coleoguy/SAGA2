@@ -51,10 +51,11 @@ plot.genarch <- function(x,
   if(min.vi > .5) cat("\nYou may want to reduce the min.vi argument to see other
                       important CGEs\n")
   #stop("select a lower min.vi to include more CGEs", call.=F)
-  # reformat and keep only the data to be plotted
-  x <- c(as.numeric(t(data$estimates)[-1, ]), as.numeric(data$varimp[,2]))
-  x <- as.data.frame(matrix(x, length(x) / 3, 3))
-  colnames(x) <- c("estimates", "SE", "vi")
+  # reformat and keep only the data to be plotted; estimates and varimp
+  # are numeric matrices with CGE names in the dimnames
+  x <- data.frame(estimates = data$estimates[1, -1],
+                  SE = data$estimates[2, -1],
+                  vi = as.numeric(data$varimp[, 1]))
   row.names(x) <- colnames(data$estimates)[-1]
 
   if(sum(x$vi >= min.vi) == 0){

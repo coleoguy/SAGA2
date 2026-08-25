@@ -6,7 +6,7 @@
 \usage{
 plotObserved(
   data,
-  SE = T,
+  SE = TRUE,
   pch = NULL,
   col = NULL,
   xlab = NULL,

@@ -7,7 +7,7 @@ AnalyzeModels <- function(data,
                           model.sum, 
                           max.models, 
                           max.pars,
-                          ret.all = T, 
+                          ret.all = TRUE, 
                           messages){
 
   ##### generate all possible models storing each matrix in a list
@@ -22,14 +22,14 @@ AnalyzeModels <- function(data,
   # allow user to overide max.par  
   if(!is.null(max.pars)) max.par <- max.pars
   
-  if(messages == T) cat(paste("Generating Models"))
+  if(messages == TRUE) cat(paste("Generating Models"))
   if(length(pos.cols) < max.par){
     max.par <- length(pos.cols)
   }
   
   # different number of par models
   for(i in 1:max.par){                     
-    if(messages == T) cat(".")
+    if(messages == TRUE) cat(".")
     foo <- combn(pos.cols, i)              
     # Models are described by a vector of the columns they include
     for(j in 1:ncol(foo)){
@@ -43,229 +43,186 @@ AnalyzeModels <- function(data,
   if(length(eqns) > 1000) x <- 500
   if(length(eqns) > 10000) x <- 5000
   
-  # now we test each model
-
-  # We need to preallocate these variables
-  # mod.results, num.pars, dev, aic
-  mod.results <- vector(mode = "list", length = length(eqns))
-  num.pars <- dev <- aic <- vector(length=length(eqns))
-  
-  # we need a counter because redundant models arrise.  These originate because
-  # some components will have high covariance 
-  # The glm function automatically throws these variables
-  # resulting in fitting the same model more than once.
-  counter <- 0
-
   # if the user supplies the matrix make sure it is numeric
   if(!is.null(Cmatrix)){
     if(is.character(Cmatrix[1, 1])){
       class(Cmatrix) <- "numeric"
     }
   }
-  
-  
-    
-  for(i in 1:length(eqns)){
-    # generate the matrix for the current model
-    test.mat <- as.matrix(Cmatrix[, c(1, eqns[[i]])])
-    
-    SEs <- data$SE
-    weights <- SEs ^ - 2
-    if(max(weights) == Inf){
-      SEs[SEs == 0] <- .000000000001
-      weights <- SEs ^ - 2
-    }
-    # fit the model weight is equal to the inverse of the square of the SE
-    temp.mod <- glm(data$mean ~ test.mat, weights = weights)
-    # this if statement will bypass a model with a singularity
-    # 1 NA will be generated for the line mean any additional are sign of sing.
-    if(sum(is.na(temp.mod$coef)) < 2){
-      counter <- counter + 1
-      # name model results as eqns
-      mod.results[[counter]] <- temp.mod
-      names(mod.results)[counter] <- i
-      # record the number of parameters in the model
-      num.pars[counter] <- length(mod.results[[counter]]$coefficients) - 1
-      # record the residual deviances
-      dev[counter] <- mod.results[[counter]]$dev
-      # record the AIC of the models
-      aic[counter] <- mod.results[[counter]]$aic
-    }
-    if(messages == T) if(i / x == round(i / x)) cat(paste("\n", i))
+  # convert the c-matrix to a numeric matrix once rather than once per model
+  mm <- as.matrix(Cmatrix)
+  storage.mode(mm) <- "numeric"
+
+  # weights are constant across models so compute them once;
+  # weight is equal to the inverse of the square of the SE
+  SEs <- data$SE
+  if(any(SEs == 0)){
+    SEs[SEs == 0] <- .000000000001
   }
-  
-  # Get rid of excess preallocation
-  mod.results <- mod.results[1:counter]
-  num.pars <- num.pars[1:counter]
-  dev <-  dev[1:counter]
-  aic <- aic[1:counter]
-  
-  
-  
-  
+  weights <- SEs ^ -2
+  n.obs <- nrow(data)
+  sum.log.w <- sum(log(weights))
+
+  # now we test each model.  For speed the exhaustive scoring pass uses
+  # lm.wfit (identical weighted least squares fits to glm but without the
+  # per-model formula/model-frame overhead); glm objects are refit below
+  # only for the models that are returned to the user.
+  n.eqns <- length(eqns)
+  keep <- logical(n.eqns)
+  num.pars <- dev <- aic <- rep(NA_real_, n.eqns)
+
+  for(i in 1:n.eqns){
+    # generate the matrix for the current model
+    X <- mm[, c(1, eqns[[i]]), drop = FALSE]
+    fit <- lm.wfit(x = X, y = data$mean, w = weights)
+    # skip models with a singularity (rank deficient fits); these arise
+    # because some components have high covariance
+    if(fit$rank == ncol(X)){
+      keep[i] <- TRUE
+      # record the number of parameters in the model
+      num.pars[i] <- fit$rank
+      # record the residual deviance
+      dv <- sum(weights * fit$residuals ^ 2)
+      dev[i] <- dv
+      # record the AIC of the model (matches stats::glm for
+      # gaussian family fits: family aic + 2 * rank)
+      aic[i] <- n.obs * (log(2 * pi * dv / n.obs) + 1) + 2 -
+        sum.log.w + 2 * fit$rank
+    }
+    if(messages == TRUE) if(i / x == round(i / x)) cat(paste("\n", i))
+  }
+
+  # keep only the models that could be fit
+  kept <- which(keep)
+  counter <- length(kept)
+  num.pars <- num.pars[kept]
+  dev <- dev[kept]
+  aic <- aic[kept]
+
   ## need to report the number of models thrown out due to 
   ## high covariance ~ singularity
-  if(messages == T){
-    if(i > counter){
-      cat(paste("\n", i - (counter - 1), 
+  if(messages == TRUE){
+    if(n.eqns > counter){
+      cat(paste("\n", n.eqns - counter, 
                 " models were removed due to high covariances \n",
                 "or linear relationships between predictor variables.  \n", "The remaining ", 
-                counter - 1, " models have been evaluated.\n\n", sep = ""))
+                counter, " models have been evaluated.\n\n", sep = ""))
     }
   }
   
-  aicc <- aic + (((2 * num.pars) * (num.pars + 1)) / 
-                   (nrow(data) - num.pars))
+  # second order AIC (AICc); K counts all estimated parameters
+  # including the residual variance (sigma^2)
+  K <- num.pars + 1
+  aicc <- ifelse(n.obs - K - 1 > 0,
+                 aic + (2 * K * (K + 1)) / (n.obs - K - 1),
+                 Inf)
   daicc <- aicc - min(aicc)
   
   # this code correctly produces akaike weights 
   waic <- (exp(-.5 * daicc)) / (sum(exp(-.5 * daicc)))
-  new.waic <- waic
-  new.waic.names <- eqns[as.numeric(names(mod.results))]
   
-  # so now we have a copy of the waics to play with
-  new.vars <- matrix(0,(ncol(Cmatrix)-1),2)
-  new.vars[,1] <- colnames(Cmatrix)[2:ncol(Cmatrix)]
-  for(i in 1:nrow(new.vars)){
-    for(j in 1:length(new.waic)){
-      if((i+1) %in% new.waic.names[[j]]){
-        new.vars[i,2] <- as.numeric(new.vars[i,2]) + new.waic[j]
-      }
-    }
-  }
+  # calculate variable importance: sum the weights of every model that
+  # contains each CGE
+  cge.names <- colnames(mm)[2:ncol(mm)]
+  memb <- unlist(eqns[kept])
+  w.rep <- rep(waic, lengths(eqns[kept]))
+  imp <- rowsum(w.rep, memb)
+  vi <- rep(0, length(cge.names))
+  vi[as.numeric(rownames(imp)) - 1] <- imp[, 1]
+  new.vars <- matrix(vi, ncol = 1,
+                     dimnames = list(cge.names, "Importance"))
   
   # lets calculate the 95% probability set of models
-  best.models <- list()
-  counter <- i <- 0
-  good.model.waics <- vector()
-  while(counter < model.sum){
-    i <- i + 1
-    counter <- counter + waic[order(waic, decreasing = T, na.last = F)][i]
-    good.model.waics[i] <- waic[order(waic, decreasing = T, na.last = F)][i]
-  }
-  best.models.ind <- order(waic, decreasing = T, na.last = F)[1:i]
-  best.models <- mod.results[best.models.ind]
-  if(messages == T){
+  o <- order(waic, decreasing = TRUE, na.last = NA)
+  n.conf <- which(cumsum(waic[o]) >= model.sum)[1]
+  if(is.na(n.conf)) n.conf <- length(o)
+  best.models.ind <- o[1:n.conf]
+  if(messages == TRUE){
     cat(paste("\nAICc weights were used to select the minimum number of models ",
               "whose weights sum \nto greater than ", 
-              model.sum * 100, "% this model set includes ", length(best.models), 
+              model.sum * 100, "% this model set includes ", length(best.models.ind), 
               " model(s)\n", sep = ""))
   }
   
-  #lets calculate variable importance
-  #which equations are being used
-  best.eqns <- eqns[as.numeric(names(best.models))]
-  best.eqns.w <- waic[sort(best.models.ind)]
-  
-  # now we need to print the model weighted averages and SE
-  # lets make a matrix of the calculated values under each model
-  par.est <- matrix(0, length(best.eqns), ncol(Cmatrix) + 2)
-  colnames(par.est) <- c('eqn', colnames(Cmatrix), 'mw')
-  par.est[, 1] <- names(best.models)
-  par.est[, 2] <- 1
-  
-  # now we need a 1 or 0  if the parameter is in the eqn
-  for(i in 1:nrow(par.est)){
-    bar <- as.numeric(par.est[i, 1])
-    par.est[i, eqns[[bar]] + 1] <- 1
+  # refit the returned models with glm so users receive standard fitted
+  # model objects; this is restricted to the confidence set (and, when
+  # requested, ret.all models) to keep the exhaustive pass fast
+  fit.glm <- function(eqn.ind){
+    test.mat <- mm[, c(1, eqns[[eqn.ind]]), drop = FALSE]
+    glm(data$mean ~ test.mat, weights = weights)
   }
   
-  # now replace 1's with the parameter estimate for each variable
-  for(i in 1:nrow(par.est)){
-    bar <- best.models[[i]]$coefficients[-2]
-    counter <- 0
-    for(j in 2:ncol(par.est)){
-      if(par.est[i, j] == 1){
-        counter <- counter + 1
-        par.est[i, j] <- bar[counter]
-      }
-    }
-  }
+  # which equations are being used and their weights; best.eqns.w is in
+  # the same (decreasing weight) order as best.models
+  best.eqn.ind <- kept[best.models.ind]
+  best.models <- lapply(best.eqn.ind, fit.glm)
+  names(best.models) <- best.eqn.ind
+  best.eqns <- eqns[best.eqn.ind]
+  best.eqns.w <- waic[best.models.ind]
   
-  # add in the aicw
-  # best.models has eqn lookup in waic
-  names(waic) <- names(mod.results)
-  for(i in 1:nrow(par.est)){
-    par.est[i, ncol(par.est)] <- waic[names(waic) == par.est[i, 1]]
+  # now we need the model weighted averages and unconditional SEs;
+  # all bookkeeping is numeric with membership tracked in a logical matrix
+  p <- ncol(mm)
+  nb <- length(best.models)
+  memb.mat <- matrix(FALSE, nb, p, dimnames = list(names(best.models),
+                                                   colnames(mm)))
+  est.mat <- var.mat <- matrix(0, nb, p,
+                               dimnames = list(names(best.models),
+                                               colnames(mm)))
+  for(i in seq_len(nb)){
+    cols <- c(1, best.eqns[[i]])
+    memb.mat[i, cols] <- TRUE
+    # drop the aliased coefficient by its NA status rather than position
+    cf <- coef(best.models[[i]])
+    est.mat[i, cols] <- cf[!is.na(cf)]
+    var.mat[i, cols] <- diag(vcov(best.models[[i]], complete = FALSE))
   }
-  
   # recalculate model waic to sum to 1
-  par.est[, 'mw'] <- as.numeric(par.est[, 'mw']) / 
-    sum(as.numeric(par.est[, 'mw']))
+  mw <- best.eqns.w / sum(best.eqns.w)
   
   # calculate the model weighted parameter estimates
-  par.est <- rbind(par.est, rep(0,ncol(par.est)))
-  for(i in 2:(ncol(par.est)-1)){
-    par.est[nrow(par.est), i] <- sum(as.numeric(par.est[1:nrow(par.est)-1, i]) * 
-                                       as.numeric(par.est[1:nrow(par.est)-1, 'mw']))
-  }
-  par.est[nrow(par.est), 1] <- 'mw.avg'
-  # now lets calculate the unconditional variances as proposed in burnham and
-  # anderson 2002 pg 162
-  # so lets duplicate table par.est to use to fill in our values
-  var.est <- par.est
-  # lets loop through models first with i ... the rows
-  for(i in 1:(nrow(var.est) - 1)){
-    counter <- 0
-    mod.vars <- diag(vcov(best.models[[which(names(best.models) == 
-                                             var.est[i, 1])]],
-                          complete = FALSE))
-    # now lets loop through parameters with j ... the columns
-    for(j in 2:(ncol(var.est) - 1)){
-      if(var.est[i, j] != 0){
-        counter <- counter + 1
-        var.est[i,j] <- mod.vars[counter] 
-      }
-    }
-  }
+  avg <- colSums(est.mat * mw)
   
-  # we now have all of the required variables for the uncond. variance est.
-  for(i in 2:(ncol(var.est) - 1)){
-    if(as.numeric(par.est[nrow(par.est), i]) != 0){
-      foo <- vector()
-      for(j in 1:(nrow(var.est) - 1)){
-        foo[j] <- as.numeric(par.est[j, 'mw']) * 
-          sqrt(as.numeric(var.est[j, i]) + 
-                 ((as.numeric(par.est[j, i]) - 
-                     as.numeric(par.est[nrow(par.est), i])) ^ 2))
-      }
-      var.est[nrow(var.est), i] <- sqrt(sum(foo) ^ 2)
+  # now lets calculate the unconditional standard errors as proposed in
+  # burnham and anderson 2002 pg 162
+  uncond.se <- rep(0, p)
+  for(i in seq_len(p)){
+    if(avg[i] != 0){
+      uncond.se[i] <- sum(mw * sqrt(var.mat[, i] +
+                                      (est.mat[, i] - avg[i]) ^ 2))
     }
   }
   
   # now lets make a table with the stuff we want
-  results <- matrix(, 2, ncol(Cmatrix))
-  colnames(results) <- colnames(Cmatrix)
+  results <- matrix(NA_real_, 2, p)
+  colnames(results) <- colnames(mm)
   row.names(results) <- c('Model Weighted Average', 
                           'Unconditional Standard Error')
-  results[1, ] <- par.est[nrow(par.est), 2:(ncol(par.est) - 1)]
-  results[2, ] <- var.est[nrow(var.est), 2:(ncol(var.est) - 1)]
+  results[1, ] <- avg
+  results[2, ] <- uncond.se
   
   ## prepare the results to be returned to the user
-  final.results <- list()
-  mod.names <- list()
-  foo2 <- colnames(Cmatrix)
-  mod.ind <- as.numeric(names(mod.results))
-  for(i in 1:length(mod.results)){
-    mod.names[[i]] <- paste(foo2[eqns[[mod.ind[i]]]], sep="", collapse=", ")
+  foo2 <- colnames(mm)
+  keep.for.all <- seq_len(counter)
+  if(counter > max.models){
+    keep.for.all <- order(waic, decreasing = TRUE)[1:max.models]
+    daicc <- daicc[order(daicc, decreasing = FALSE)[1:max.models]]
   }
-  names(mod.results) <- mod.names
-  if(length(mod.results) > max.models){
-    mod.results <- mod.results[order(waic, decreasing = T)[1:max.models]]
-    daicc <- daicc[order(daicc, decreasing =F)[1:max.models]]
+  mod.results <- NULL
+  if(ret.all == TRUE){
+    all.eqn.ind <- kept[keep.for.all]
+    mod.results <- lapply(all.eqn.ind, fit.glm)
+    names(mod.results) <- vapply(all.eqn.ind, function(ix){
+      paste(foo2[eqns[[ix]]], sep = "", collapse = ", ")
+    }, character(1))
   }
-  if(ret.all == TRUE) final.results[[1]] <- mod.results
-  if(ret.all == FALSE) final.results[[1]] <- NULL
-  final.results[[2]] <- best.models
-  final.results[[3]] <- best.eqns.w
-  final.results[[4]] <- results
-  final.results[[5]] <- daicc
-  final.results[[6]] <- new.vars
-  final.results[[7]] <- cbind(crosses, Cmatrix)
-  names(final.results) <- c("all.models", "best.models", 
-                            "best.eqns.w", "estimates", 
-                            "daicc", "varimp",
-                            "cmatrix")
+  final.results <- list(all.models = mod.results,
+                        best.models = best.models,
+                        best.eqns.w = best.eqns.w,
+                        estimates = results,
+                        daicc = daicc,
+                        varimp = new.vars,
+                        cmatrix = cbind(crosses, Cmatrix))
   class(final.results) <- "genarch"
   return(final.results)
 }

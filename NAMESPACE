@@ -5,23 +5,31 @@ export(EvaluateModel)
 export(LCA)
 export(VisModelSpace)
 export(plotObserved)
-importFrom(grDevices,heat.colors)
-importFrom(grDevices,rgb)
-importFrom(graphics,abline)
-importFrom(graphics,axis)
-importFrom(graphics,barplot)
-importFrom(graphics,lines)
-importFrom(graphics,mtext)
-importFrom(graphics,par)
-importFrom(graphics,plot)
-importFrom(graphics,segments)
-importFrom(graphics,text)
+importFrom(grDevices,
+  heat.colors,
+  rgb
+)
+importFrom(graphics,
+  abline,
+  axis,
+  barplot,
+  lines,
+  mtext,
+  par,
+  plot,
+  segments,
+  text
+)
 importFrom(gtools,combinations)
 importFrom(plotrix,color.legend)
-importFrom(stats,complete.cases)
-importFrom(stats,glm)
-importFrom(stats,pchisq)
-importFrom(stats,rnorm)
-importFrom(stats,var)
-importFrom(stats,vcov)
+importFrom(stats,
+  coef,
+  complete.cases,
+  glm,
+  lm.wfit,
+  pchisq,
+  rnorm,
+  var,
+  vcov
+)
 importFrom(utils,combn)

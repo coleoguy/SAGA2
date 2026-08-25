@@ -21,6 +21,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Heath Blackmon \email{coleoguy@gmail.com} (\href{https://orcid.org/0000-0002-5433-4036}{ORCID})
   \item Jeffery P. Demuth
 }
 

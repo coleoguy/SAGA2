@@ -16,6 +16,10 @@ ReScale2 <- function(x) {
 ########################################
 
 ######### validate data ################
+# Validates the user supplied data and arguments. Because R passes
+# arguments by value, any fixes applied here (SCS synonyms, missing
+# environmental values, SE column renaming) must be returned to the
+# caller; validateData returns a list with the corrected data and SCS.
 validateData <- function(SCS, user.data, Cmatrix, messages){
   # if they are supplying the Cmatrix lets do a couple of basic checks
   if(!is.null(Cmatrix)){
@@ -26,6 +30,12 @@ validateData <- function(SCS, user.data, Cmatrix, messages){
       if(!sum(user.data[,1] %in% Cmatrix[,1]) == nrow(user.data)){
         stop("The cross names in your data don't
              match those in your user supplied c-matrix")
+      }
+      # the first CGE column must be the all-1s mean column; the rest of
+      # the package assumes this column is present in every model
+      if(!isTRUE(all(as.numeric(Cmatrix[, 2]) == 1))){
+        stop("The second column of a user supplied c-matrix must be the
+             mean column and contain only 1s.")
       }
     }
   }
@@ -58,6 +68,10 @@ validateData <- function(SCS, user.data, Cmatrix, messages){
   if (!is.numeric(user.data$SE)) {
     stop("Standard Errors must be numeric values")
   }
+  if (any(is.na(user.data$SE))) {
+    stop(paste("Standard Errors contain NA values in row(s):",
+               paste(which(is.na(user.data$SE)), collapse = ", ")))
+  }
   # If the user supplies no environmental values fill with 1
   if(all(is.na(user.data$enviro))) user.data$enviro <- 1
 
@@ -66,37 +80,43 @@ validateData <- function(SCS, user.data, Cmatrix, messages){
     stop("Environment values need to be numeric values.  If you have discrete
        environmental states use -1 and 1.")
   }
-  # Test that sire and dam values are less than num of rows
+  # Test that every sire and dam value is a valid row number
   if(is.null(Cmatrix)){
-    if (all(user.data$sire > NROW(user.data)) || all(user.data$dam > NROW(user.data))) {
-      stop("Sire and Dam row values are invalid.")
+    n <- NROW(user.data)
+    bad <- which(is.na(user.data$sire) | is.na(user.data$dam) |
+                   user.data$sire < 1 | user.data$dam < 1 |
+                   user.data$sire > n | user.data$dam > n |
+                   user.data$sire != round(user.data$sire) |
+                   user.data$dam != round(user.data$dam))
+    if (length(bad) > 0) {
+      stop(paste("Sire and dam values must be integer row numbers between 1
+    and the number of rows in your data (", n, "). Problem row(s): ",
+                 paste(bad, collapse = ", "), sep = ""))
     }
   }
+  # return the corrected data and SCS to the caller
+  return(list(data = user.data, SCS = SCS))
 }
 
 
 ######### End of validation testing ####
 
 ######### Clean the Cmatrix #############
-CleanCmatrix <- function(Cmatrix, messages=F){
+CleanCmatrix <- function(Cmatrix, messages=FALSE){
   # lets pull out crosses
   crosses <- Cmatrix[, 1]
   Cmatrix <- Cmatrix[, -1]
   # lets remove variables that have no difference in lines
   Cmatrix <- Cmatrix[, c(1, which(apply(Cmatrix, 2, var) != 0))]
   #lets look for composite effects that are identical
-  drop.counter <- vector()
-  for(i in 2:(ncol(Cmatrix)-1)){
-    for(j in (i+1):ncol(Cmatrix)){
-      if(sum(Cmatrix[,i] == Cmatrix[,j]) == nrow(Cmatrix)){
-        drop.counter <- c(drop.counter, j)
-      }
-    }
-  }
+  # (duplicated() on the transposed matrix flags every column that is
+  # identical to an earlier column and safely handles minimal c-matrices)
+  drop.counter <- which(duplicated(t(Cmatrix)))
+  drop.counter <- drop.counter[drop.counter >= 2]
   #drop those composite effects that are equivelant of lower order simpler effects
   if(length(drop.counter)>0){
     badCGEs <- paste(colnames(Cmatrix)[drop.counter], sep=", ", collapse=", ")
-    if(messages==T){
+    if(messages==TRUE){
       cat(paste("The following composite effects cannot be estimated with the line \n",
                 "means available because they estimate identical quantities to \n",
                 "lower order effects: \n", badCGEs, "\n\n", sep=""))

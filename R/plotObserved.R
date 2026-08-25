@@ -33,14 +33,14 @@
 #' data(BanInf)
 #' plotObserved(BanInf)
 plotObserved <- function(data,
-                         SE=T,
+                         SE=TRUE,
                          pch=NULL,
                          col=NULL,
                          xlab=NULL,
                          ylab=NULL,
                          main=NULL,
                          env=FALSE){
-  .pardefault <- par(no.readonly = T)
+  .pardefault <- par(no.readonly = TRUE)
 
   # fill in some defaults
   if(is.null(pch)) pch <- 16
@@ -51,19 +51,21 @@ plotObserved <- function(data,
   # get the x and y
   x <- PrepareCmatrix(user.data = data, SCS = "XY",
                       parental = "calc", drop.pars = NULL,
-                      keep.pars = NULL, messages=F, env=F)$Aa
+                      keep.pars = NULL, messages=FALSE, env=FALSE)$Aa
   x <- (x-min(x)) / (max(x)-min(x)) * 100
   y <- data$mean
   se <- data$SE
 
-  # jitter the x values since they are often the same
+  # fit the additive expectation on the unjittered x values weighted by
+  # the inverse squared standard errors (matching the package convention)
+  add.fit <- glm(y ~ x, weights = se ^ -2)
+
+  # jitter the x values (plotting only) since they are often the same
   if(length(unique(x)) != length(x)){
      x <- x + rnorm(mean=0, sd=.8, n=length(x))
-  }else{
-     x <- x
   }
 
-  if(SE==T){
+  if(SE==TRUE){
 
     high <- max(y + se)
     low <- min(y - se)
@@ -78,6 +80,6 @@ plotObserved <- function(data,
     plot(x=x, y=y, ylab=ylab, xlab=xlab, col=rgb(.1,.1,.1,.5), xaxt="n", pch=pch, main=main)
   }
   axis(side=1,labels=c(0,50,100), at=c(0,50,100))
-  abline(glm(y~x, weights = se), lty="dashed", col="blue")
+  abline(add.fit, lty="dashed", col="blue")
   par(.pardefault)
 }

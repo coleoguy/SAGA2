@@ -31,7 +31,7 @@ VisModelSpace <- function(data,
                           cex.mtext=1,
                           cex.leg=.8,
                           cex.mod=.35){
-  .pardefault <- par(no.readonly = T)
+  .pardefault <- par(no.readonly = TRUE)
   models <- data[[1]] #mod.results
   data <- data[[5]]   #daicc
   colors <- heat.colors(1101)

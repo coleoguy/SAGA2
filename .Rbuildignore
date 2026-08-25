@@ -3,6 +3,7 @@
 ^\.Rproj\.user$
 ^README\.Rmd$
 ^LICENSE\.md$
+^LICENSE$
 ^cran-comments\.md$
 ^\.DS_Store$
 ^\.Rhistory$

@@ -36,8 +36,17 @@ test_that("LCA without ret.all returns NULL for all.models", {
 test_that("LCA varimp scores are between 0 and 1", {
   data(BanInf)
   result <- LCA(BanInf, SCS = "NSC", messages = FALSE)
-  vi_scores <- as.numeric(result$varimp[, 2])
+  expect_true(is.numeric(result$varimp))
+  vi_scores <- as.numeric(result$varimp[, 1])
   expect_true(all(vi_scores >= 0 & vi_scores <= 1))
+  expect_true(all(rownames(result$varimp) %in%
+                    colnames(result$cmatrix)))
+})
+
+test_that("LCA estimates are numeric", {
+  data(BanInf)
+  result <- LCA(BanInf, SCS = "NSC", messages = FALSE)
+  expect_true(is.numeric(result$estimates))
 })
 
 test_that("LCA drop.pars removes specified CGEs", {

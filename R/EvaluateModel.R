@@ -15,10 +15,13 @@
 #' @param cex.main Numeric. Expansion factor for the main title. Default
 #'   is `1`.
 #'
-#' @return A list with three elements:
+#' @return A list with four elements:
 #' \describe{
-#'   \item{Estiamtes}{A 2-row matrix with parameter estimates (row 1) and
+#'   \item{Estimates}{A 2-row matrix with parameter estimates (row 1) and
 #'     conditional standard errors (row 2) for each CGE in the model.}
+#'   \item{Estiamtes}{Deprecated alias for `Estimates`, kept for backwards
+#'     compatibility with older scripts. Will be removed in a future
+#'     release.}
 #'   \item{P.val}{Numeric. P-value from a chi-squared goodness-of-fit test
 #'     of the model's residual deviance.}
 #'   \item{Bonf.Corr.Alpha}{Numeric. Bonferroni-corrected significance level
@@ -36,7 +39,12 @@
 #' EvaluateModel(result, model = 1)
 EvaluateModel <-
 function(data, model, cex.axis=1, cex.names=1, cex.main=1){
-  .pardefault <- par(no.readonly = T)
+  if(is.null(data$all.models)){
+    stop("EvaluateModel requires a genarch object produced with
+    ret.all = TRUE so that all fitted models are available.")
+  }
+  .pardefault <- par(no.readonly = TRUE)
+  on.exit(par(.pardefault))
   result <- data[[1]][[model]]
   pars <- c("Mean", strsplit(names(data[[1]])[model], split = ", ")[[1]])
   par.est <- summary(result)$coefficients[, 1]
@@ -64,13 +72,16 @@ function(data, model, cex.axis=1, cex.names=1, cex.main=1){
   results[2, ] <- se.est
   colnames(results) <- pars
   row.names(results) <- c("Estimate", "Cond. SE")
-  model.p <- 1 - pchisq(result$deviance, result$df.residual, lower.tail = T)
-  mult.test <- 0.05 / length(data)
+  model.p <- 1 - pchisq(result$deviance, result$df.residual, lower.tail = TRUE)
+  # Bonferroni correction uses the total number of models evaluated
+  mult.test <- 0.05 / length(data$all.models)
   final.results <- list()
   final.results[[1]] <- results
-  final.results[[2]] <- model.p
-  final.results[[3]] <- mult.test
-  names(final.results) <- c("Estiamtes", "P.val", "Bonf.Corr.Alpha")
+  # "Estiamtes" is a deprecated alias kept for backwards compatibility
+  final.results[[2]] <- results
+  final.results[[3]] <- model.p
+  final.results[[4]] <- mult.test
+  names(final.results) <- c("Estimates", "Estiamtes", "P.val",
+                            "Bonf.Corr.Alpha")
   return(final.results)
-  par(.pardefault)
 }

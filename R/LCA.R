@@ -41,8 +41,10 @@
 #'   model equation. Useful for reducing computation time with large model
 #'   spaces. Default is `NULL` (determined automatically).
 #' @param Cmatrix Optional matrix. A user-supplied C-matrix describing the
-#'   expected contribution of CGEs to each cohort. If `NULL`, the C-matrix
-#'   is constructed automatically from the breeding design. Default is `NULL`.
+#'   expected contribution of CGEs to each cohort. The first column must
+#'   contain the cross names and the second column must be the mean column
+#'   (all 1s); this is checked. If `NULL`, the C-matrix is constructed
+#'   automatically from the breeding design. Default is `NULL`.
 #' @param ret.all Logical. Whether to return fitted model objects for all
 #'   evaluated models. Setting to `TRUE` increases memory usage substantially.
 #'   Default is `FALSE`.
@@ -73,14 +75,15 @@
 #'   \item{best.models}{A list of fitted `glm` model objects for models in
 #'     the confidence set.}
 #'   \item{best.eqns.w}{Numeric vector of Akaike weights for models in the
-#'     confidence set.}
-#'   \item{estimates}{A 2-row matrix with model-weighted average parameter
-#'     estimates (row 1) and unconditional standard errors (row 2) for each
-#'     CGE.}
+#'     confidence set, in the same (decreasing weight) order as
+#'     `best.models`.}
+#'   \item{estimates}{A numeric 2-row matrix with model-weighted average
+#'     parameter estimates (row 1) and unconditional standard errors
+#'     (row 2) for each CGE.}
 #'   \item{daicc}{Numeric vector of delta AICc scores for all evaluated
 #'     models.}
-#'   \item{varimp}{A 2-column matrix with CGE names (column 1) and variable
-#'     importance scores (column 2).}
+#'   \item{varimp}{A numeric 1-column matrix of variable importance scores
+#'     with CGE names as row names.}
 #'   \item{cmatrix}{The C-matrix used in the analysis, with cross names
 #'     prepended.}
 #' }
@@ -128,8 +131,12 @@ LCA <- function(data,
     data$sex <- rep("F", length(data$sex))
   }
 
-  # validate the incoming arguments and data
-  validateData(SCS = SCS, user.data = data, Cmatrix = Cmatrix, messages = messages)
+  # validate the incoming arguments and data; validateData returns the
+  # corrected data (e.g. filled enviro, SE column name) and SCS (e.g. X0->XO)
+  validated <- validateData(SCS = SCS, user.data = data, Cmatrix = Cmatrix,
+                            messages = messages)
+  data <- validated$data
+  SCS <- validated$SCS
   data$cross <- toupper(data$cross)
   ### if no custom matrix is supplied build a cmatrix based
   ### on the user data and arguments supplied
@@ -149,13 +156,13 @@ LCA <- function(data,
 
   ### report the composite genetic effects being explored
   have.data <- paste(colnames(Cmatrix)[-1], collapse = ", ")
-  if(messages == T) cat(paste("The composite genetic effects that will be tested are: \n",
+  if(messages == TRUE) cat(paste("The composite genetic effects that will be tested are: \n",
                               have.data, "\n", collapse = ", "))
 
   ### calculate the potential size of model space
   mod.space.size <- sum(choose(ncol(Cmatrix) -1 , 1:(nrow(Cmatrix) - 2)))
   if(!is.null(max.pars)) mod.space.size <- sum(choose((ncol(Cmatrix) -1), 1:max.pars))
-  if(messages == T){
+  if(messages == TRUE){
     if(mod.space.size > 5000){
       cat(paste("Since there are", mod.space.size,
                 "possible models this may take a bit:\n"))

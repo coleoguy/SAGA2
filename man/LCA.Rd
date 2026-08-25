@@ -66,8 +66,10 @@ model equation. Useful for reducing computation time with large model
 spaces. Default is \code{NULL} (determined automatically).}
 
 \item{Cmatrix}{Optional matrix. A user-supplied C-matrix describing the
-expected contribution of CGEs to each cohort. If \code{NULL}, the C-matrix
-is constructed automatically from the breeding design. Default is \code{NULL}.}
+expected contribution of CGEs to each cohort. The first column must
+contain the cross names and the second column must be the mean column
+(all 1s); this is checked. If \code{NULL}, the C-matrix is constructed
+automatically from the breeding design. Default is \code{NULL}.}
 
 \item{ret.all}{Logical. Whether to return fitted model objects for all
 evaluated models. Setting to \code{TRUE} increases memory usage substantially.
@@ -87,14 +89,15 @@ models (or \code{NULL} if \code{ret.all = FALSE}).}
 \item{best.models}{A list of fitted \code{glm} model objects for models in
 the confidence set.}
 \item{best.eqns.w}{Numeric vector of Akaike weights for models in the
-confidence set.}
-\item{estimates}{A 2-row matrix with model-weighted average parameter
-estimates (row 1) and unconditional standard errors (row 2) for each
-CGE.}
+confidence set, in the same (decreasing weight) order as
+\code{best.models}.}
+\item{estimates}{A numeric 2-row matrix with model-weighted average
+parameter estimates (row 1) and unconditional standard errors
+(row 2) for each CGE.}
 \item{daicc}{Numeric vector of delta AICc scores for all evaluated
 models.}
-\item{varimp}{A 2-column matrix with CGE names (column 1) and variable
-importance scores (column 2).}
+\item{varimp}{A numeric 1-column matrix of variable importance scores
+with CGE names as row names.}
 \item{cmatrix}{The C-matrix used in the analysis, with cross names
 prepended.}
 }
